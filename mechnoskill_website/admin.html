@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mechnoskill — Admin Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800&family=Barlow+Condensed:wght@600;700;800&display=swap" rel="stylesheet">
+<script src="db.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:"Barlow",sans-serif;background:#f4f4f2;color:#1a1a1a;display:flex;min-height:100vh}
+/* LOGIN */
+.login-screen{position:fixed;inset:0;background:#1a1a1a;display:flex;align-items:center;justify-content:center;z-index:9999;flex-direction:column;gap:0}
+.login-box{background:#2b2b2b;border:1px solid #3a3a3a;border-radius:12px;padding:40px;width:380px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.login-logo{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:24px}
+.login-logo img{width:52px;height:52px;object-fit:contain;border-radius:6px}
+.login-logo-text{font-family:"Barlow Condensed",sans-serif;font-size:24px;font-weight:800;color:#fff}
+.login-logo-text span{color:#F5C800}
+.lf{margin-bottom:14px;text-align:left}
+.lf label{font-size:11px;font-weight:700;color:#666;text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:5px}
+.lf input{width:100%;background:#1e1e1e;border:1px solid #3a3a3a;border-radius:6px;padding:10px 14px;font-size:14px;color:#fff;outline:none;font-family:"Barlow",sans-serif;transition:border-color .2s}
+.lf input:focus{border-color:#F5C800}
+.login-btn{width:100%;background:#F5C800;color:#1e1e1e;border:none;border-radius:6px;padding:13px;font-size:15px;font-weight:800;cursor:pointer;margin-top:8px;letter-spacing:.5px;font-family:"Barlow",sans-serif}
+.login-btn:hover{background:#D4AA00}
+.login-err{color:#e74c3c;font-size:12px;margin-top:8px;display:none}
+/* LAYOUT */
+.sidebar{width:220px;min-width:220px;background:#2b2b2b;position:fixed;top:0;left:0;height:100vh;z-index:100;overflow-y:auto;display:flex;flex-direction:column}
+.sb-logo{display:flex;align-items:center;gap:10px;padding:18px 16px;border-bottom:1px solid #3a3a3a}
+.sb-logo img{width:38px;height:38px;object-fit:contain;border-radius:4px}
+.sb-logo-text{font-family:"Barlow Condensed",sans-serif;font-size:18px;font-weight:800;color:#fff}
+.sb-logo-text span{color:#F5C800}
+.sb-logo-sub{font-size:9px;color:#555;letter-spacing:1px;text-transform:uppercase}
+.sb-section{padding:12px 16px 4px;font-size:9px;font-weight:800;color:#555;letter-spacing:1.5px;text-transform:uppercase}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 16px;color:#888;font-size:13px;font-weight:500;cursor:pointer;transition:all .2s;border-left:3px solid transparent;text-decoration:none;background:none;border-top:none;border-right:none;border-bottom:none;width:100%;font-family:"Barlow",sans-serif;text-align:left}
+.nav-item svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.8;flex-shrink:0}
+.nav-item:hover,.nav-item.active{background:#353535;color:#F5C800;border-left-color:#F5C800;padding-left:13px}
+.nav-badge{background:#F5C800;color:#1e1e1e;font-size:9px;font-weight:800;padding:1px 6px;border-radius:10px;margin-left:auto}
+.sb-footer{margin-top:auto;padding:14px;border-top:1px solid #3a3a3a}
+.sb-user{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.sb-avatar{width:32px;height:32px;background:#F5C800;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#1e1e1e;flex-shrink:0}
+.sb-name{font-size:12px;font-weight:700;color:#fff}
+.sb-role{font-size:10px;color:#555}
+.logout-btn{width:100%;background:transparent;border:1px solid #3a3a3a;color:#888;border-radius:4px;padding:7px;font-size:12px;font-weight:600;cursor:pointer;font-family:"Barlow",sans-serif}
+.logout-btn:hover{border-color:#F5C800;color:#F5C800}
+/* MAIN */
+.main{margin-left:220px;flex:1;min-height:100vh;display:flex;flex-direction:column}
+.topbar{background:#fff;border-bottom:1px solid #e8e8e8;padding:14px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
+.topbar-title{font-family:"Barlow Condensed",sans-serif;font-size:22px;font-weight:800;color:#1e1e1e}
+.topbar-right{display:flex;align-items:center;gap:12px}
+.view-site-btn{background:#2b2b2b;color:#fff;border:none;border-radius:4px;padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer;text-decoration:none;display:inline-block;font-family:"Barlow",sans-serif}
+.view-site-btn:hover{background:#1e1e1e}
+.content{padding:24px 28px;flex:1}
+.panel{display:none}.panel.active{display:block}
+/* STATS */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px}
+.stat-card{background:#fff;border:1px solid #e8e8e8;border-radius:8px;padding:16px 18px;display:flex;align-items:center;gap:12px}
+.stat-icon{width:44px;height:44px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.stat-icon svg{width:20px;height:20px;fill:none;stroke-width:1.8}
+.si-y{background:#FFFDE7}.si-y svg{stroke:#F5C800}
+.si-d{background:#2b2b2b}.si-d svg{stroke:#F5C800}
+.si-g{background:#E8F5E9}.si-g svg{stroke:#2E7D32}
+.si-b{background:#E3F2FD}.si-b svg{stroke:#1565C0}
+.stat-num{font-family:"Barlow Condensed",sans-serif;font-size:26px;font-weight:800;color:#1e1e1e;line-height:1}
+.stat-lbl{font-size:11px;color:#888;margin-top:3px}
+.stat-chg{font-size:11px;font-weight:700;margin-top:3px;color:#2E7D32}
+/* CARD */
+.card{background:#fff;border:1px solid #e8e8e8;border-radius:8px;margin-bottom:18px;overflow:hidden}
+.card-hd{padding:14px 18px;border-bottom:1px solid #f0f0f0;display:flex;align-items:center;justify-content:space-between}
+.card-title{font-family:"Barlow Condensed",sans-serif;font-size:17px;font-weight:800;color:#1e1e1e}
+.card-body{padding:18px}
+/* BUTTONS */
+.btn-y{background:#F5C800;color:#1e1e1e;border:none;border-radius:4px;padding:8px 16px;font-size:13px;font-weight:800;cursor:pointer;font-family:"Barlow",sans-serif}
+.btn-y:hover{background:#D4AA00}
+.btn-d{background:#2b2b2b;color:#fff;border:none;border-radius:4px;padding:8px 16px;font-size:13px;font-weight:700;cursor:pointer;font-family:"Barlow",sans-serif}
+.btn-d:hover{background:#1e1e1e}
+.btn-o{background:transparent;color:#888;border:1px solid #e8e8e8;border-radius:4px;padding:6px 12px;font-size:12px;font-weight:600;cursor:pointer;font-family:"Barlow",sans-serif}
+.btn-o:hover{border-color:#F5C800;color:#F5C800}
+.btn-danger{background:#fff;color:#e74c3c;border:1px solid #f0d0d0;border-radius:4px;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:"Barlow",sans-serif}
+.btn-danger:hover{background:#FFEBEE;border-color:#e74c3c}
+.btn-sm{padding:5px 10px;font-size:11px}
+/* TABLE */
+.data-tbl{width:100%;border-collapse:collapse}
+.data-tbl th{background:#f9f9f8;padding:9px 12px;text-align:left;font-size:10px;font-weight:800;color:#888;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid #f0f0f0}
+.data-tbl td{padding:11px 12px;border-bottom:1px solid #f5f5f5;font-size:12px;color:#444;vertical-align:middle}
+.data-tbl tr:last-child td{border-bottom:none}
+.data-tbl tr:hover td{background:#fafafa}
+.badge{padding:3px 9px;border-radius:20px;font-size:10px;font-weight:700;display:inline-block}
+.b-ok{background:#E8F5E9;color:#2E7D32}
+.b-warn{background:#FFFDE7;color:#F57F17}
+.b-info{background:#E3F2FD;color:#1565C0}
+.b-danger{background:#FFEBEE;color:#C62828}
+/* FORMS */
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.fg .full{grid-column:1/-1}
+.fgroup{display:flex;flex-direction:column;gap:5px}
+.fgroup label{font-size:11px;font-weight:700;color:#555;text-transform:uppercase;letter-spacing:.3px}
+.fgroup label .req{color:#F5C800}
+.fgroup input,.fgroup select,.fgroup textarea{border:1px solid #e8e8e8;border-radius:4px;padding:9px 11px;font-size:13px;font-family:"Barlow",sans-serif;outline:none;transition:border-color .2s;background:#fff;width:100%}
+.fgroup input:focus,.fgroup select:focus,.fgroup textarea:focus{border-color:#F5C800}
+.fgroup textarea{resize:vertical;min-height:75px}
+.form-actions{display:flex;gap:10px;margin-top:16px;padding-top:14px;border-top:1px solid #f0f0f0}
+/* PRODUCT IMAGE UPLOAD */
+.img-upload-area{border:2px dashed #e8e8e8;border-radius:8px;padding:0;text-align:center;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;min-height:180px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#fafafa}
+.img-upload-area:hover{border-color:#F5C800;background:#FFFDE7}
+.img-upload-area.has-image{border-color:#F5C800;background:#fff}
+.img-upload-area input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.img-upload-area img{max-width:100%;max-height:160px;object-fit:contain;border-radius:4px}
+.img-upload-icon{font-size:32px;margin-bottom:8px}
+.img-upload-text{font-size:13px;color:#888;font-weight:500}
+.img-upload-sub{font-size:11px;color:#bbb;margin-top:4px}
+.img-preview-wrap{position:relative;width:100%;padding:10px}
+.img-remove-btn{position:absolute;top:4px;right:4px;background:#e74c3c;color:#fff;border:none;border-radius:50%;width:22px;height:22px;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:800;line-height:1}
+/* PROD THUMB */
+.pthumbnail{width:42px;height:42px;background:#f4f4f2;border:1px solid #eee;border-radius:4px;display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0}
+.pthumbnail img{width:38px;height:38px;object-fit:contain}
+.pthumbnail svg{width:20px;height:20px;stroke:#ccc;fill:none;stroke-width:1.2}
+/* FILTER BAR */
+.fbar{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;align-items:center}
+.fbar input{flex:1;min-width:180px;border:1px solid #e8e8e8;border-radius:4px;padding:8px 11px;font-size:13px;outline:none;font-family:"Barlow",sans-serif}
+.fbar input:focus{border-color:#F5C800}
+.fbar select{border:1px solid #e8e8e8;border-radius:4px;padding:8px 11px;font-size:13px;outline:none;background:#fff;cursor:pointer;font-family:"Barlow",sans-serif}
+/* MODAL */
+.modal-ov{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:300;display:none;align-items:center;justify-content:center;padding:20px}
+.modal-ov.open{display:flex}
+.modal{background:#fff;border-radius:8px;width:100%;max-width:640px;max-height:92vh;overflow-y:auto}
+.modal-hd{padding:16px 22px;border-bottom:1px solid #f0f0f0;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:#fff;z-index:1}
+.modal-title{font-family:"Barlow Condensed",sans-serif;font-size:20px;font-weight:800;color:#1e1e1e}
+.modal-close{background:none;border:none;font-size:22px;cursor:pointer;color:#888;line-height:1;padding:0 4px}
+.modal-close:hover{color:#1e1e1e}
+.modal-body{padding:22px}
+/* TOAST */
+.adm-toast{position:fixed;bottom:24px;right:24px;background:#2b2b2b;color:#fff;padding:12px 18px;border-radius:6px;font-size:13px;font-weight:600;z-index:9999;border-left:4px solid #F5C800;opacity:0;transition:opacity .3s;max-width:300px;pointer-events:none}
+.adm-toast.show{opacity:1}
+/* TOGGLE */
+.toggle{width:36px;height:20px;background:#e0e0e0;border-radius:10px;cursor:pointer;position:relative;transition:background .2s;flex-shrink:0;display:inline-block}
+.toggle.on{background:#F5C800}
+.toggle::after{content:"";position:absolute;width:16px;height:16px;background:#fff;border-radius:50%;top:2px;left:2px;transition:left .2s;box-shadow:0 1px 3px rgba(0,0,0,.15)}
+.toggle.on::after{left:18px}
+.srow{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid #f5f5f5;font-size:13px;color:#555}
+.srow:last-child{border-bottom:none}
+.srow strong{display:block;font-weight:700;color:#1e1e1e;font-size:13px;margin-bottom:2px}
+.srow small{font-size:11px;color:#aaa}
+/* BAR CHART */
+.bar-chart{display:flex;align-items:flex-end;gap:8px;height:120px;padding:0 4px}
+.bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}
+.bar{background:#F5C800;border-radius:4px 4px 0 0;width:100%;min-height:4px}
+.bar-lbl{font-size:10px;color:#888;text-align:center}
+.bar-val{font-size:10px;font-weight:700;color:#1e1e1e;text-align:center}
+/* OVERVIEW */
+.ov-grid{display:grid;grid-template-columns:2fr 1fr;gap:18px}
+.qa-btn{display:flex;align-items:center;gap:10px;padding:11px 13px;background:#f9f9f8;border:1px solid #e8e8e8;border-radius:6px;cursor:pointer;transition:all .2s;text-decoration:none;color:#1e1e1e;margin-bottom:8px;font-family:"Barlow",sans-serif;font-size:13px;font-weight:600;width:100%;border-top:1px solid #e8e8e8}
+.qa-btn svg{width:16px;height:16px;stroke:#F5C800;fill:none;stroke-width:1.8;flex-shrink:0}
+.qa-btn:hover{background:#FFFDE7;border-color:#F5C800}
+.act-item{display:flex;gap:10px;padding:10px 0;border-bottom:1px solid #f5f5f5;align-items:flex-start;font-size:12px}
+.act-item:last-child{border-bottom:none}
+.act-dot{width:7px;height:7px;border-radius:50%;background:#F5C800;flex-shrink:0;margin-top:4px}
+.act-text{flex:1;color:#555;line-height:1.5}
+.act-time{font-size:10px;color:#bbb;white-space:nowrap}
+@media(max-width:900px){.stats-row{grid-template-columns:1fr 1fr}.ov-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div class="login-screen" id="loginScreen">
+  <div class="login-box">
+    <div class="login-logo">
+      <img src="assets/logo.jpg" alt="Mechnoskill" onerror="this.style.display='none'">
+      <div><div class="login-logo-text">MECHNO<span>SKILL</span></div><div style="font-size:9px;color:#555;letter-spacing:1.5px;text-transform:uppercase">Admin Panel</div></div>
+    </div>
+    <div class="lf"><label>Username</label><input type="text" id="admUser" placeholder="admin" autocomplete="username"></div>
+    <div class="lf"><label>Password</label><input type="password" id="admPass" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()"></div>
+    <div class="login-err" id="loginErr">Wrong username or password</div>
+    <button class="login-btn" onclick="doLogin()">Sign In to Dashboard →</button>
+    <div style="font-size:11px;color:#555;margin-top:10px">Default: <span style="color:#F5C800">admin</span> / <span style="color:#F5C800">admin123</span></div>
+  </div>
+</div>
+
+<!-- SIDEBAR -->
+<div class="sidebar" id="sidebar">
+  <div class="sb-logo">
+    <img src="assets/logo.jpg" alt="Mechnoskill" onerror="this.style.display='none'" style="width:38px;height:38px;object-fit:contain;border-radius:4px">
+    <div><div class="sb-logo-text">MECHNO<span>SKILL</span></div><div class="sb-logo-sub">Admin Panel</div></div>
+  </div>
+  <div class="sb-section">Main</div>
+  <button class="nav-item active" onclick="showPanel('Overview',this)"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Overview</button>
+  <button class="nav-item" onclick="showPanel('Products',this)"><svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>Products<span class="nav-badge" id="prodBadge">0</span></button>
+  <button class="nav-item" onclick="showPanel('Orders',this)"><svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>Orders<span class="nav-badge" id="ordersBadge">0</span></button>
+  <button class="nav-item" onclick="showPanel('Quotes',this)"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Quotes<span class="nav-badge" id="quotesBadge">0</span></button>
+  <div class="sb-section">Content</div>
+  <button class="nav-item" onclick="showPanel('Categories',this)"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Categories</button>
+  <button class="nav-item" onclick="showPanel('Brands',this)"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg>Brands</button>
+  <button class="nav-item" onclick="showPanel('Pages',this)"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Pages</button>
+  <div class="sb-section">Settings</div>
+  <button class="nav-item" onclick="showPanel('Settings',this)"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Settings</button>
+  <div class="sb-footer">
+    <div class="sb-user"><div class="sb-avatar" id="sbAvatar">AD</div><div><div class="sb-name" id="sbName">Admin</div><div class="sb-role">Administrator</div></div></div>
+    <button class="logout-btn" onclick="doLogout()">Sign Out</button>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-title" id="topTitle">Overview</div>
+    <div class="topbar-right">
+      <a href="index.html" target="_blank" class="view-site-btn">View Website ↗</a>
+    </div>
+  </div>
+  <div class="content">
+
+    <!-- OVERVIEW -->
+    <div class="panel active" id="panelOverview">
+      <div class="stats-row">
+        <div class="stat-card"><div class="stat-icon si-y"><svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg></div><div><div class="stat-num" id="ovOrders">0</div><div class="stat-lbl">Total Orders</div><div class="stat-chg">↑ this month</div></div></div>
+        <div class="stat-card"><div class="stat-icon si-d"><svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div><div><div class="stat-num" id="ovRevenue" style="font-size:18px">SAR 0</div><div class="stat-lbl">Revenue</div></div></div>
+        <div class="stat-card"><div class="stat-icon si-g"><svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg></div><div><div class="stat-num" id="ovProds">0</div><div class="stat-lbl">Products</div></div></div>
+        <div class="stat-card"><div class="stat-icon si-b"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg></div><div><div class="stat-num" id="ovQuotes">0</div><div class="stat-lbl">Quote Requests</div></div></div>
+      </div>
+      <div class="ov-grid">
+        <div>
+          <div class="card"><div class="card-hd"><div class="card-title">Sales Chart</div></div><div class="card-body"><div class="bar-chart"><div class="bar-wrap"><div class="bar-val">820</div><div class="bar" style="height:55px"></div><div class="bar-lbl">Mon</div></div><div class="bar-wrap"><div class="bar-val">1240</div><div class="bar" style="height:82px"></div><div class="bar-lbl">Tue</div></div><div class="bar-wrap"><div class="bar-val">670</div><div class="bar" style="height:45px"></div><div class="bar-lbl">Wed</div></div><div class="bar-wrap"><div class="bar-val">1890</div><div class="bar" style="height:100px"></div><div class="bar-lbl">Thu</div></div><div class="bar-wrap"><div class="bar-val">1120</div><div class="bar" style="height:74px"></div><div class="bar-lbl">Fri</div></div><div class="bar-wrap"><div class="bar-val">440</div><div class="bar" style="height:30px;background:#e8e8e8"></div><div class="bar-lbl">Sat</div></div><div class="bar-wrap"><div class="bar-val">—</div><div class="bar" style="height:8px;background:#e8e8e8"></div><div class="bar-lbl">Sun</div></div></div></div></div>
+          <div class="card"><div class="card-hd"><div class="card-title">Recent Orders</div><button class="btn-o btn-sm" onclick="showPanel('Orders',document.querySelectorAll('.nav-item')[2])">View All</button></div><div id="ovOrdersTable" style="padding:0"></div></div>
+        </div>
+        <div>
+          <div class="card"><div class="card-hd"><div class="card-title">Quick Actions</div></div><div class="card-body" style="padding:12px">
+            <button class="qa-btn" onclick="showPanel('Products',document.querySelectorAll('.nav-item')[1]);setTimeout(openAddProd,100)"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add New Product</button>
+            <button class="qa-btn" onclick="showPanel('Quotes',document.querySelectorAll('.nav-item')[3])"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg>View Quote Requests</button>
+            <button class="qa-btn" onclick="showPanel('Settings',document.querySelectorAll('.nav-item')[7])"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82"/></svg>Site Settings</button>
+            <a class="qa-btn" href="index.html" target="_blank"><svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>View Live Website</a>
+          </div></div>
+          <div class="card"><div class="card-hd"><div class="card-title">Recent Activity</div></div><div class="card-body" style="padding:0 16px" id="activityLog">
+            <div class="act-item"><div class="act-dot"></div><div class="act-text">Admin dashboard loaded</div><div class="act-time">now</div></div>
+          </div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PRODUCTS -->
+    <div class="panel" id="panelProducts">
+      <div class="fbar">
+        <input type="text" placeholder="Search by name, SKU, brand..." id="prodSearch" oninput="renderProds()">
+        <select id="prodCatF" onchange="renderProds()"><option value="">All Categories</option><option>bearings</option><option>fasteners</option><option>hydraulics</option><option>safety</option><option>tools</option><option>electrical</option><option>pipes</option></select>
+        <button class="btn-y" onclick="openAddProd()">+ Add Product</button>
+      </div>
+      <div class="card"><div id="prodTableWrap" style="overflow-x:auto"></div></div>
+    </div>
+
+    <!-- ORDERS -->
+    <div class="panel" id="panelOrders">
+      <div class="card"><div id="ordersTableWrap" style="overflow-x:auto"></div></div>
+    </div>
+
+    <!-- QUOTES -->
+    <div class="panel" id="panelQuotes">
+      <div class="card"><div id="quotesTableWrap" style="overflow-x:auto"></div></div>
+    </div>
+
+    <!-- CATEGORIES -->
+    <div class="panel" id="panelCategories">
+      <div class="card"><div class="card-body" style="padding:0">
+        <table class="data-tbl">
+          <thead><tr><th>Category</th><th>Slug</th><th>Link</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Bearings</strong></td><td><code style="font-size:11px;background:#f4f4f2;padding:2px 6px;border-radius:3px">bearings</code></td><td><a href="shop.html?cat=bearings" target="_blank" class="btn-o btn-sm">Preview ↗</a></td></tr>
+            <tr><td><strong>Fasteners</strong></td><td><code style="font-size:11px;background:#f4f4f2;padding:2px 6px;border-radius:3px">fasteners</code></td><td><a href="shop.html?cat=fasteners" target="_blank" class="btn-o btn-sm">Preview ↗</a></td></tr>
+            <tr><td><strong>Hydraulics</strong></td><td><code style="font-size:11px;background:#f4f4f2;padding:2px 6px;border-radius:3px">hydraulics</code></td><td><a href="shop.html?cat=hydraulics" target="_blank" class="btn-o btn-sm">Preview ↗</a></td></tr>
+            <tr><td><strong>Safety Equipment</strong></td><td><code style="font-size:11px;background:#f4f4f2;padding:2px 6px;border-radius:3px">safety</code></td><td><a href="shop.html?cat=safety" target="_blank" class="btn-o btn-sm">Preview ↗</a></td></tr>
+            <tr><td><strong>Tools & Machinery</strong></td><td><code style="font-size:11px;background:#f4f4f2;padding:2px 6px;border-radius:3px">tools</code></td><td><a href="shop.html?cat=tools" target="_blank" class="btn-o btn-sm">Preview ↗</a></td></tr>
+            <tr><td><strong>Electrical</strong></td><td><code style="font-size:11px;background:#f4f4f2;padding:2px 6px;border-radius:3px">electrical</code></td><td><a href="shop.html?cat=electrical" target="_blank" class="btn-o btn-sm">Preview ↗</a></td></tr>
+            <tr><td><strong>Pipes & Fittings</strong></td><td><code style="font-size:11px;background:#f4f4f2;padding:2px 6px;border-radius:3px">pipes</code></td><td><a href="shop.html?cat=pipes" target="_blank" class="btn-o btn-sm">Preview ↗</a></td></tr>
+          </tbody>
+        </table>
+      </div></div>
+    </div>
+
+    <!-- BRANDS -->
+    <div class="panel" id="panelBrands">
+      <div class="card"><div class="card-body" style="padding:0">
+        <table class="data-tbl"><thead><tr><th>Brand</th><th>Link</th></tr></thead><tbody id="brandsTbody"></tbody></table>
+      </div></div>
+    </div>
+
+    <!-- PAGES -->
+    <div class="panel" id="panelPages">
+      <div class="card"><div class="card-body" style="padding:0">
+        <table class="data-tbl"><thead><tr><th>Page</th><th>File</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Homepage</strong></td><td><code style="font-size:11px;background:#f4f4f2;padding:2px 6px;border-radius:3px">index.html</code></td><td><span class="badge b-ok">Live</span></td><td><a href="index.html" target="_blank" class="btn-o btn-sm">Preview ↗</a></td></tr>
+          <tr><td><strong>Shop</strong></td><td><code style="font-size:11px;background:#f4f4f2;padding:2px 6px;border-radius:3px">shop.html</code></td><td><span class="badge b-ok">Live</span></td><td><a href="shop.html" target="_blank" class="btn-o btn-sm">Preview ↗</a></td></tr>
+          <tr><td><strong>Product Detail</strong></td><td><code style="font-size:11px;background:#f4f4f2;padding:2px 6px;border-radius:3px">product.html</code></td><td><span class="badge b-ok">Live</span></td><td><a href="product.html" target="_blank" class="btn-o btn-sm">Preview ↗</a></td></tr>
+          <tr><td><strong>Cart & Checkout</strong></td><td><code style="font-size:11px;background:#f4f4f2;padding:2px 6px;border-radius:3px">cart.html</code></td><td><span class="badge b-ok">Live</span></td><td><a href="cart.html" target="_blank" class="btn-o btn-sm">Preview ↗</a></td></tr>
+          <tr><td><strong>Contact & Quote</strong></td><td><code style="font-size:11px;background:#f4f4f2;padding:2px 6px;border-radius:3px">contact.html</code></td><td><span class="badge b-ok">Live</span></td><td><a href="contact.html" target="_blank" class="btn-o btn-sm">Preview ↗</a></td></tr>
+          <tr><td><strong>My Account</strong></td><td><code style="font-size:11px;background:#f4f4f2;padding:2px 6px;border-radius:3px">account.html</code></td><td><span class="badge b-ok">Live</span></td><td><a href="account.html" target="_blank" class="btn-o btn-sm">Preview ↗</a></td></tr>
+          <tr><td><strong>About Us</strong></td><td><code style="font-size:11px;background:#f4f4f2;padding:2px 6px;border-radius:3px">about.html</code></td><td><span class="badge b-ok">Live</span></td><td><a href="about.html" target="_blank" class="btn-o btn-sm">Preview ↗</a></td></tr>
+          <tr><td><strong>Industries</strong></td><td><code style="font-size:11px;background:#f4f4f2;padding:2px 6px;border-radius:3px">industries.html</code></td><td><span class="badge b-ok">Live</span></td><td><a href="industries.html" target="_blank" class="btn-o btn-sm">Preview ↗</a></td></tr>
+        </tbody></table>
+      </div></div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div class="panel" id="panelSettings">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px">
+        <div class="card"><div class="card-hd"><div class="card-title">General</div></div><div class="card-body">
+          <div class="fg" style="grid-template-columns:1fr">
+            <div class="fgroup"><label>Phone Number</label><input type="text" id="sPhone"></div>
+            <div class="fgroup"><label>WhatsApp Number <small style="text-transform:none;font-weight:400;color:#aaa">(digits only, e.g. 966501234567)</small></label><input type="text" id="sWA"></div>
+            <div class="fgroup"><label>Email</label><input type="email" id="sEmail"></div>
+            <div class="fgroup"><label>Address</label><input type="text" id="sAddr"></div>
+            <div class="fgroup"><label>Business Hours</label><input type="text" id="sHours"></div>
+          </div>
+          <div class="form-actions"><button class="btn-y" onclick="saveGeneralSettings()">Save Settings</button></div>
+        </div></div>
+        <div class="card"><div class="card-hd"><div class="card-title">Display Options</div></div><div class="card-body">
+          <div class="srow"><div><strong>Show WhatsApp Button</strong><small>Floating button on all pages</small></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+          <div class="srow"><div><strong>VAT Inclusive Prices</strong><small>Show "Incl. VAT" label</small></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+          <div class="srow"><div><strong>Free Shipping Banner</strong><small>Top announcement bar</small></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+          <div class="srow"><div><strong>Arabic Language Toggle</strong><small>Show العربية in header</small></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+        </div></div>
+        <div class="card"><div class="card-hd"><div class="card-title">Change Admin Password</div></div><div class="card-body">
+          <div class="fg" style="grid-template-columns:1fr">
+            <div class="fgroup"><label>Current Password</label><input type="password" id="sCurrPass" placeholder="••••••••"></div>
+            <div class="fgroup"><label>New Password</label><input type="password" id="sNewPass" placeholder="••••••••"></div>
+            <div class="fgroup"><label>Confirm New Password</label><input type="password" id="sConfPass" placeholder="••••••••"></div>
+          </div>
+          <div class="form-actions"><button class="btn-y" onclick="changePassword()">Update Password</button></div>
+        </div></div>
+        <div class="card"><div class="card-hd"><div class="card-title">SEO</div></div><div class="card-body">
+          <div class="fg" style="grid-template-columns:1fr">
+            <div class="fgroup"><label>Meta Title</label><input type="text" value="Mechnoskill — Industrial Supplier Saudi Arabia"></div>
+            <div class="fgroup"><label>Meta Description</label><textarea>Your trusted source for tools, bearings, hydraulics, safety equipment across Saudi Arabia.</textarea></div>
+          </div>
+          <div class="form-actions"><button class="btn-y" onclick="toast('SEO settings saved!')">Save SEO</button></div>
+        </div></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ADD/EDIT PRODUCT MODAL -->
+<div class="modal-ov" id="prodModal">
+  <div class="modal">
+    <div class="modal-hd">
+      <div class="modal-title" id="modalTitle">Add New Product</div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <!-- PHOTO UPLOAD -->
+      <div class="fgroup full" style="margin-bottom:16px">
+        <label>Product Photo</label>
+        <div class="img-upload-area" id="imgUploadArea" onclick="document.getElementById('photoInput').click()">
+          <input type="file" id="photoInput" accept="image/*" style="display:none" onchange="handlePhotoUpload(this)">
+          <div id="imgPlaceholder">
+            <div class="img-upload-icon">📷</div>
+            <div class="img-upload-text">Click to upload product photo</div>
+            <div class="img-upload-sub">JPG, PNG, WebP — Max 5MB</div>
+          </div>
+          <div id="imgPreviewWrap" style="display:none;position:relative;padding:10px;width:100%">
+            <img id="imgPreview" src="" alt="Product" style="max-width:100%;max-height:160px;object-fit:contain;border-radius:4px;display:block;margin:0 auto">
+            <button class="img-remove-btn" onclick="event.stopPropagation();removePhoto()" title="Remove photo">✕</button>
+          </div>
+        </div>
+        <input type="hidden" id="fImageData" value="">
+      </div>
+      <div class="fg">
+        <div class="fgroup full"><label>Product Name <span class="req">*</span></label><input type="text" id="fName" placeholder="e.g. Deep Groove Ball Bearing 6205-2RS"></div>
+        <div class="fgroup"><label>Brand <span class="req">*</span></label><select id="fBrand"><option>SKF</option><option>BOSCH</option><option>HONEYWELL</option><option>STANLEY</option><option>MAKITA</option><option>FAG</option><option>MSA</option><option>FLUKE</option><option>PARKER</option><option>3M</option><option>NTN</option><option>NSK</option><option>TIMKEN</option></select></div>
+        <div class="fgroup"><label>Category <span class="req">*</span></label><select id="fCat"><option value="bearings">Bearings</option><option value="fasteners">Fasteners</option><option value="hydraulics">Hydraulics</option><option value="safety">Safety Equipment</option><option value="tools">Tools & Machinery</option><option value="electrical">Electrical</option><option value="pipes">Pipes & Fittings</option></select></div>
+        <div class="fgroup"><label>SKU <span class="req">*</span></label><input type="text" id="fSku" placeholder="e.g. MNS-BRG-6205"></div>
+        <div class="fgroup"><label>Price (SAR) <span class="req">*</span></label><input type="number" id="fPrice" placeholder="0.00" min="0" step="0.01"></div>
+        <div class="fgroup"><label>Stock Quantity</label><input type="number" id="fStock" placeholder="0" min="0" value="0"></div>
+        <div class="fgroup"><label>Badge</label><select id="fBadge"><option value="">None</option><option value="NEW">NEW</option><option value="FEATURED">FEATURED</option><option value="SALE">SALE</option></select></div>
+        <div class="fgroup"><label>Rating</label><select id="fRating"><option value="5">★★★★★ (5)</option><option value="4">★★★★☆ (4)</option><option value="3">★★★☆☆ (3)</option></select></div>
+        <div class="fgroup full"><label>Description</label><textarea id="fDesc" placeholder="Brief product description for the product page..."></textarea></div>
+      </div>
+      <div class="form-actions">
+        <button class="btn-y" id="saveProdBtn" onclick="saveProduct()">Save Product</button>
+        <button class="btn-o" onclick="closeModal()">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="adm-toast" id="admToast"></div>
+
+<script>
+let editingId = null;
+
+// ---- AUTH ----
+function doLogin(){
+  const u = document.getElementById('admUser').value.trim();
+  const p = document.getElementById('admPass').value;
+  const s = MDB.getSettings();
+  if(u === s.adminUser && p === s.adminPass){
+    document.getElementById('loginScreen').style.display = 'none';
+    initDashboard();
+  } else {
+    document.getElementById('loginErr').style.display = 'block';
+    document.getElementById('admPass').value = '';
+  }
+}
+function doLogout(){
+  document.getElementById('loginScreen').style.display = 'flex';
+  document.getElementById('admUser').value = '';
+  document.getElementById('admPass').value = '';
+  document.getElementById('loginErr').style.display = 'none';
+}
+
+// ---- PANEL NAV ----
+function showPanel(name, el){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('panel'+name).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(a=>a.classList.remove('active'));
+  if(el) el.classList.add('active');
+  document.getElementById('topTitle').textContent = name;
+  if(name==='Products') renderProds();
+  if(name==='Orders') renderOrders();
+  if(name==='Quotes') renderQuotes();
+  if(name==='Brands') renderBrands();
+  if(name==='Settings') loadSettings();
+}
+
+// ---- INIT ----
+function initDashboard(){
+  const prods = MDB.getProducts();
+  const orders = MDB.getOrders();
+  const quotes = MDB.getQuotes();
+  document.getElementById('ovProds').textContent = prods.length;
+  document.getElementById('ovOrders').textContent = orders.length;
+  document.getElementById('ovQuotes').textContent = quotes.length;
+  document.getElementById('prodBadge').textContent = prods.length;
+  document.getElementById('ordersBadge').textContent = orders.length;
+  document.getElementById('quotesBadge').textContent = quotes.filter(q=>q.status==='Pending').length;
+  const revenue = orders.reduce((s,o)=>s+(o.total||0),0);
+  document.getElementById('ovRevenue').textContent = 'SAR '+revenue.toLocaleString();
+
+  // Recent orders table
+  const recent = orders.slice(0,4);
+  document.getElementById('ovOrdersTable').innerHTML = recent.length ? `
+    <table class="data-tbl">
+      <thead><tr><th>Order #</th><th>Customer</th><th>Total</th><th>Status</th></tr></thead>
+      <tbody>${recent.map(o=>`<tr><td><strong style="color:#F5C800">${o.id}</strong></td><td>${o.shFirst||''} ${o.shLast||''}</td><td style="font-weight:700">SAR ${(o.total||0).toFixed(2)}</td><td><span class="badge b-warn">${o.status}</span></td></tr>`).join('')}</tbody>
+    </table>` : '<div style="padding:20px;text-align:center;color:#aaa;font-size:13px">No orders yet. <a href="shop.html" target="_blank" style="color:#F5C800">Share your shop</a> to get started!</div>';
+}
+
+// ---- PRODUCTS ----
+function renderProds(){
+  const q = (document.getElementById('prodSearch')?.value||'').toLowerCase();
+  const cat = document.getElementById('prodCatF')?.value||'';
+  let prods = MDB.getProducts();
+  if(q) prods = prods.filter(p=>p.name.toLowerCase().includes(q)||p.sku.toLowerCase().includes(q)||p.brand.toLowerCase().includes(q));
+  if(cat) prods = prods.filter(p=>p.cat===cat);
+  document.getElementById('prodBadge').textContent = MDB.getProducts().length;
+
+  const stars = r => '★'.repeat(r)+'☆'.repeat(5-r);
+  const badgeMap = {NEW:'b-info',FEATURED:'b-warn',SALE:'b-danger'};
+
+  document.getElementById('prodTableWrap').innerHTML = `<table class="data-tbl">
+    <thead><tr><th>Photo</th><th>Product</th><th>SKU</th><th>Cat.</th><th>Price</th><th>Stock</th><th>Badge</th><th>Rating</th><th>Actions</th></tr></thead>
+    <tbody>${prods.map(p=>`<tr>
+      <td><div class="pthumbnail">${p.image?`<img src="${p.image}" alt="${p.name}">`:`<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="8"/></svg>`}</div></td>
+      <td style="max-width:200px"><a href="product.html?id=${p.id}" target="_blank" style="font-weight:600;color:#1e1e1e;text-decoration:none">${p.name}</a></td>
+      <td><code style="font-size:10px;background:#f4f4f2;padding:2px 5px;border-radius:3px">${p.sku}</code></td>
+      <td style="text-transform:capitalize;font-size:11px">${p.cat}</td>
+      <td style="font-weight:700">SAR ${p.price.toFixed(2)}</td>
+      <td><span class="${(p.stock||0)>0?'badge b-ok':'badge b-danger'}">${p.stock||0}</span></td>
+      <td>${p.badge?`<span class="badge ${badgeMap[p.badge]||'b-warn'}">${p.badge}</span>`:'-'}</td>
+      <td><span style="color:#F5C800">${stars(p.rating)}</span></td>
+      <td><div style="display:flex;gap:5px;flex-wrap:wrap">
+        <button class="btn-o btn-sm" onclick="editProd('${p.id}')">Edit</button>
+        <button class="btn-danger btn-sm" onclick="deleteProd('${p.id}')">Delete</button>
+      </div></td>
+    </tr>`).join('')}</tbody>
+  </table>`;
+
+  if(!prods.length) document.getElementById('prodTableWrap').innerHTML = '<div style="padding:32px;text-align:center;color:#aaa">No products found. <button class="btn-y btn-sm" onclick="openAddProd()">Add Product</button></div>';
+}
+
+// ---- ADD/EDIT PRODUCT ----
+function openAddProd(){
+  editingId = null;
+  document.getElementById('modalTitle').textContent = 'Add New Product';
+  document.getElementById('saveProdBtn').textContent = 'Save Product';
+  ['fName','fSku','fDesc'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('fPrice').value='';
+  document.getElementById('fStock').value='0';
+  document.getElementById('fBadge').value='';
+  document.getElementById('fImageData').value='';
+  document.getElementById('fRating').value='5';
+  removePhoto();
+  document.getElementById('prodModal').classList.add('open');
+  setTimeout(()=>document.getElementById('fName').focus(),100);
+}
+function editProd(id){
+  const p = MDB.getProduct(id); if(!p)return;
+  editingId = id;
+  document.getElementById('modalTitle').textContent = 'Edit Product';
+  document.getElementById('saveProdBtn').textContent = 'Update Product';
+  document.getElementById('fName').value = p.name;
+  document.getElementById('fSku').value = p.sku;
+  document.getElementById('fPrice').value = p.price;
+  document.getElementById('fStock').value = p.stock||0;
+  document.getElementById('fBrand').value = p.brand;
+  document.getElementById('fCat').value = p.cat;
+  document.getElementById('fBadge').value = p.badge||'';
+  document.getElementById('fRating').value = p.rating||5;
+  document.getElementById('fDesc').value = p.desc||'';
+  document.getElementById('fImageData').value = p.image||'';
+  if(p.image){
+    document.getElementById('imgPlaceholder').style.display='none';
+    document.getElementById('imgPreviewWrap').style.display='block';
+    document.getElementById('imgPreview').src = p.image;
+    document.getElementById('imgUploadArea').classList.add('has-image');
+  } else { removePhoto(); }
+  document.getElementById('prodModal').classList.add('open');
+}
+function saveProduct(){
+  const name = document.getElementById('fName').value.trim();
+  const sku = document.getElementById('fSku').value.trim();
+  const price = parseFloat(document.getElementById('fPrice').value);
+  if(!name||!sku||isNaN(price)||price<0){ toast('Please fill required fields (Name, SKU, Price)'); return; }
+
+  const prod = {
+    name, sku, price,
+    brand: document.getElementById('fBrand').value,
+    cat: document.getElementById('fCat').value,
+    badge: document.getElementById('fBadge').value,
+    rating: parseInt(document.getElementById('fRating').value)||5,
+    reviews: editingId ? (MDB.getProduct(editingId)?.reviews||0) : 0,
+    stock: parseInt(document.getElementById('fStock').value)||0,
+    desc: document.getElementById('fDesc').value.trim(),
+    image: document.getElementById('fImageData').value,
+  };
+
+  if(editingId){
+    MDB.updateProduct(editingId, prod);
+    toast('✓ Product updated: '+name.substring(0,30));
+    addActivity('Product updated: '+name.substring(0,30));
+  } else {
+    MDB.addProduct(prod);
+    toast('✓ Product added: '+name.substring(0,30));
+    addActivity('New product added: '+name.substring(0,30));
+  }
+  renderProds();
+  closeModal();
+  initDashboard();
+}
+function deleteProd(id){
+  const p = MDB.getProduct(id);
+  if(!confirm('Delete "'+p?.name+'"? This cannot be undone.')) return;
+  MDB.deleteProduct(id);
+  renderProds();
+  toast('Product deleted.');
+  initDashboard();
+  addActivity('Product deleted: '+(p?.name||id));
+}
+
+// ---- PHOTO UPLOAD ----
+function handlePhotoUpload(input){
+  const file = input.files[0];
+  if(!file) return;
+  if(file.size > 5 * 1024 * 1024){ toast('File too large — max 5MB'); return; }
+  if(!file.type.startsWith('image/')){ toast('Please select an image file'); return; }
+
+  const reader = new FileReader();
+  reader.onload = function(e){
+    const dataUrl = e.target.result;
+    document.getElementById('fImageData').value = dataUrl;
+    document.getElementById('imgPreview').src = dataUrl;
+    document.getElementById('imgPlaceholder').style.display = 'none';
+    document.getElementById('imgPreviewWrap').style.display = 'block';
+    document.getElementById('imgUploadArea').classList.add('has-image');
+    toast('✓ Photo uploaded — '+(file.name||'image'));
+  };
+  reader.readAsDataURL(file);
+}
+function removePhoto(){
+  document.getElementById('fImageData').value = '';
+  document.getElementById('imgPreview').src = '';
+  document.getElementById('imgPlaceholder').style.display = 'flex';
+  document.getElementById('imgPreviewWrap').style.display = 'none';
+  document.getElementById('imgUploadArea').classList.remove('has-image');
+  document.getElementById('photoInput').value = '';
+}
+
+// ---- ORDERS ----
+function renderOrders(){
+  const orders = MDB.getOrders();
+  if(!orders.length){
+    document.getElementById('ordersTableWrap').innerHTML='<div style="padding:32px;text-align:center;color:#aaa;font-size:13px">No orders yet.</div>';
+    return;
+  }
+  document.getElementById('ordersTableWrap').innerHTML = `<table class="data-tbl">
+    <thead><tr><th>Order #</th><th>Date</th><th>Customer</th><th>Total</th><th>Status</th><th>Update</th></tr></thead>
+    <tbody>${orders.map(o=>`<tr>
+      <td><strong style="color:#F5C800">${o.id}</strong></td>
+      <td>${o.date}</td>
+      <td>${o.shFirst||''} ${o.shLast||''}<br><small style="color:#aaa">${o.shEmail||''}</small></td>
+      <td style="font-weight:700">SAR ${(o.total||0).toFixed(2)}</td>
+      <td><span class="badge b-warn">${o.status}</span></td>
+      <td><select style="font-size:11px;border:1px solid #e8e8e8;border-radius:4px;padding:4px 6px;outline:none;font-family:'Barlow',sans-serif" onchange="updateOrderStatus('${o.id}',this.value)">
+        <option ${o.status==='Processing'?'selected':''}>Processing</option>
+        <option ${o.status==='Shipped'?'selected':''}>Shipped</option>
+        <option ${o.status==='Delivered'?'selected':''}>Delivered</option>
+        <option ${o.status==='Cancelled'?'selected':''}>Cancelled</option>
+      </select></td>
+    </tr>`).join('')}</tbody>
+  </table>`;
+}
+function updateOrderStatus(id, status){
+  const orders = MDB.getOrders();
+  const o = orders.find(x=>x.id===id);
+  if(o){ o.status=status; localStorage.setItem('ms_orders',JSON.stringify(orders)); toast('Order '+id+' updated to '+status); addActivity('Order '+id+' → '+status); }
+}
+
+// ---- QUOTES ----
+function renderQuotes(){
+  const quotes = MDB.getQuotes();
+  if(!quotes.length){
+    document.getElementById('quotesTableWrap').innerHTML='<div style="padding:32px;text-align:center;color:#aaa;font-size:13px">No quote requests yet. <a href="contact.html" target="_blank" style="color:#F5C800">View contact page</a></div>';
+    return;
+  }
+  document.getElementById('quotesTableWrap').innerHTML = `<table class="data-tbl">
+    <thead><tr><th>Quote #</th><th>Date</th><th>Customer</th><th>Product</th><th>Qty</th><th>Status</th><th>Actions</th></tr></thead>
+    <tbody>${quotes.map(q=>`<tr>
+      <td><strong style="color:#F5C800">${q.id}</strong></td>
+      <td>${q.date}</td>
+      <td>${q.name||'—'}</td>
+      <td>${q.product||'—'}</td>
+      <td>${q.qty||'—'}</td>
+      <td><span class="badge ${q.status==='Pending'?'b-warn':'b-ok'}">${q.status}</span></td>
+      <td><button class="btn-y btn-sm" onclick="respondQuote('${q.id}')">Reply</button></td>
+    </tr>`).join('')}</tbody>
+  </table>`;
+}
+function respondQuote(id){
+  const quotes = MDB.getQuotes();
+  const q = quotes.find(x=>x.id===id);
+  if(q){ q.status='Replied'; localStorage.setItem('ms_quotes',JSON.stringify(quotes)); renderQuotes(); toast('Quote '+id+' marked as Replied'); addActivity('Replied to quote '+id); }
+}
+
+// ---- BRANDS ----
+function renderBrands(){
+  const prods = MDB.getProducts();
+  const brands = [...new Set(prods.map(p=>p.brand))].sort();
+  document.getElementById('brandsTbody').innerHTML = brands.map(b=>`<tr><td><strong>${b}</strong></td><td><a href="shop.html?brand=${b}" target="_blank" class="btn-o btn-sm">View Products ↗</a></td></tr>`).join('');
+}
+
+// ---- SETTINGS ----
+function loadSettings(){
+  const s = MDB.getSettings();
+  document.getElementById('sPhone').value = s.phone||'';
+  document.getElementById('sWA').value = s.whatsapp||'';
+  document.getElementById('sEmail').value = s.email||'';
+  document.getElementById('sAddr').value = s.address||'';
+  document.getElementById('sHours').value = s.hours||'';
+}
+function saveGeneralSettings(){
+  const s = MDB.getSettings();
+  s.phone = document.getElementById('sPhone').value.trim();
+  s.whatsapp = document.getElementById('sWA').value.trim();
+  s.email = document.getElementById('sEmail').value.trim();
+  s.address = document.getElementById('sAddr').value.trim();
+  s.hours = document.getElementById('sHours').value.trim();
+  MDB.saveSettings(s);
+  toast('✓ Settings saved! Reload website to see changes.');
+  addActivity('Site settings updated');
+}
+function changePassword(){
+  const curr = document.getElementById('sCurrPass').value;
+  const newp = document.getElementById('sNewPass').value;
+  const conf = document.getElementById('sConfPass').value;
+  const s = MDB.getSettings();
+  if(curr !== s.adminPass){ toast('Current password is incorrect'); return; }
+  if(newp.length < 6){ toast('New password must be at least 6 characters'); return; }
+  if(newp !== conf){ toast('Passwords do not match'); return; }
+  s.adminPass = newp;
+  MDB.saveSettings(s);
+  document.getElementById('sCurrPass').value = '';
+  document.getElementById('sNewPass').value = '';
+  document.getElementById('sConfPass').value = '';
+  toast('✓ Password updated successfully!');
+  addActivity('Admin password changed');
+}
+
+// ---- MODAL ----
+function closeModal(){
+  document.getElementById('prodModal').classList.remove('open');
+  editingId = null;
+}
+
+// ---- ACTIVITY LOG ----
+function addActivity(text){
+  const log = document.getElementById('activityLog');
+  if(!log) return;
+  const item = document.createElement('div');
+  item.className = 'act-item';
+  item.innerHTML = `<div class="act-dot"></div><div class="act-text">${text}</div><div class="act-time">now</div>`;
+  log.insertBefore(item, log.firstChild);
+  const items = log.querySelectorAll('.act-item');
+  if(items.length > 8) items[items.length-1].remove();
+}
+
+// ---- TOAST ----
+function toast(msg){
+  const t = document.getElementById('admToast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(t._t); t._t = setTimeout(()=>t.classList.remove('show'), 3500);
+}
+
+// ---- INIT ----
+window.addEventListener('DOMContentLoaded', ()=>{
+  document.getElementById('prodModal').addEventListener('click', function(e){ if(e.target===this) closeModal(); });
+  // Drag & drop on upload area
+  const area = document.getElementById('imgUploadArea');
+  area.addEventListener('dragover', e=>{ e.preventDefault(); area.style.borderColor='#F5C800'; });
+  area.addEventListener('dragleave', ()=>{ area.style.borderColor=''; });
+  area.addEventListener('drop', e=>{
+    e.preventDefault(); area.style.borderColor='';
+    const file = e.dataTransfer.files[0];
+    if(file && file.type.startsWith('image/')){
+      const dt = new DataTransfer(); dt.items.add(file);
+      document.getElementById('photoInput').files = dt.files;
+      handlePhotoUpload(document.getElementById('photoInput'));
+    }
+  });
+  // Enter key on login
+  document.getElementById('admUser').addEventListener('keydown', e=>{ if(e.key==='Enter') document.getElementById('admPass').focus(); });
+});
+</script>
+</body>
+</html>

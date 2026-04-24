@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contact & Quote | Mechnoskill</title>
+<link rel="stylesheet" href="style.css">
+<script src="db.js"></script>
+<script src="components.js" defer></script>
+<style>
+.page-hero{background:linear-gradient(135deg,#1e1e1e,#2b2b2b);padding:36px 32px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px}
+.page-hero h1{font-family:"Barlow Condensed",sans-serif;font-size:34px;font-weight:800;color:#fff}
+.page-hero h1 span{color:#F5C800}
+.page-hero p{color:#777;font-size:14px;margin-top:6px}
+.page-tabs{display:flex;gap:10px;flex-wrap:wrap}
+.ptab{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:#ccc;font-size:13px;font-weight:700;padding:9px 20px;border-radius:4px;cursor:pointer;transition:all .2s}
+.ptab.active,.ptab:hover{background:#F5C800;border-color:#F5C800;color:#1e1e1e}
+.pg{display:none}.pg.active{display:block}
+.pg-wrap{display:grid;grid-template-columns:1fr 300px;gap:20px;padding:28px 32px}
+.form-card{background:#fff;border:1px solid #e8e8e8;border-radius:8px;padding:28px}
+.form-card h2{font-family:"Barlow Condensed",sans-serif;font-size:22px;font-weight:800;color:#1e1e1e;margin-bottom:6px}
+.form-card p{font-size:13px;color:#888;margin-bottom:22px}
+.form-grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.form-grid2 .full{grid-column:1/-1}
+.upload-zone{border:2px dashed #e8e8e8;border-radius:6px;padding:20px;text-align:center;cursor:pointer;transition:all .2s}
+.upload-zone:hover{border-color:#F5C800;background:#FFFDE7}
+.upload-zone svg{width:28px;height:28px;stroke:#bbb;fill:none;stroke-width:1.5;margin:0 auto 8px;display:block}
+.upload-zone p{font-size:12px;color:#999}
+.upload-zone p span{color:#F5C800;font-weight:700}
+.submit-btn{width:100%;background:#F5C800;color:#1e1e1e;border:none;border-radius:4px;padding:13px;font-size:15px;font-weight:800;cursor:pointer;margin-top:16px;letter-spacing:.5px}
+.submit-btn:hover{background:#D4AA00}
+.note{font-size:12px;color:#aaa;text-align:center;margin-top:8px}
+.info-card{background:#fff;border:1px solid #e8e8e8;border-radius:8px;padding:20px;margin-bottom:14px}
+.info-card h3{font-family:"Barlow Condensed",sans-serif;font-size:17px;font-weight:800;color:#1e1e1e;margin-bottom:14px}
+.iitem{display:flex;gap:10px;margin-bottom:12px;align-items:flex-start}
+.iitem svg{width:16px;height:16px;stroke:#F5C800;fill:none;stroke-width:1.8;flex-shrink:0;margin-top:2px}
+.iitem-text strong{display:block;font-size:11px;font-weight:700;color:#1e1e1e;text-transform:uppercase;letter-spacing:.3px;margin-bottom:2px}
+.iitem-text span{font-size:13px;color:#666}
+.wa-cta{background:#25D366;border-radius:6px;padding:12px 16px;display:flex;align-items:center;gap:10px;cursor:pointer;margin-top:8px;text-decoration:none}
+.wa-cta svg{width:20px;height:20px;fill:#fff}
+.wa-cta span{color:#fff;font-size:13px;font-weight:700}
+.why-list{display:flex;flex-direction:column;gap:9px}
+.why-li{display:flex;align-items:center;gap:8px;font-size:12px;color:#666}
+.why-chk{width:18px;height:18px;background:#FFFDE7;border:1.5px solid #F5C800;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#F5C800;font-size:10px;font-weight:800;flex-shrink:0}
+.success-msg{background:#E8F5E9;border:1px solid #A5D6A7;border-radius:6px;padding:14px 18px;font-size:13px;color:#2E7D32;font-weight:600;margin-top:14px;display:none;align-items:center;gap:8px}
+.success-msg.show{display:flex}
+.map-box{background:linear-gradient(135deg,#e8eef5,#d0dce8);border-radius:8px;height:180px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;border:1px solid #e0e8f0}
+.map-box svg{width:32px;height:32px;stroke:#F5C800;fill:none;stroke-width:1.5}
+.map-box p{font-size:13px;color:#8fa4c0;font-weight:700}
+.map-box span{font-size:11px;color:#aab8c8}
+@media(max-width:800px){.pg-wrap{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div id="header-root"></div>
+<div class="breadcrumb"><a href="index.html">Home</a> › <span class="cur">Contact & Quote</span></div>
+
+<div class="page-hero">
+  <div><h1>Get in <span>Touch</span></h1><p>Our team responds within 24 hours — quotes, support, or bulk orders.</p></div>
+  <div class="page-tabs">
+    <div class="ptab active" onclick="switchTab('quote',this)">📋 Request a Quote</div>
+    <div class="ptab" onclick="switchTab('contact',this)">📞 Contact Us</div>
+  </div>
+</div>
+
+<!-- QUOTE -->
+<div class="pg active" id="pgQuote">
+  <div class="pg-wrap">
+    <div class="form-card">
+      <h2>Request a Quote</h2>
+      <p>Fill in the form and our sales team will respond with competitive pricing within 24 hours.</p>
+      <div class="form-grid2">
+        <div><label class="form-label">Full Name *</label><input class="form-input" type="text" placeholder="Ahmed Al-Rashidi" id="qName"></div>
+        <div><label class="form-label">Company Name *</label><input class="form-input" type="text" placeholder="Company (optional)" id="qCompany"></div>
+        <div><label class="form-label">Email *</label><input class="form-input" type="email" placeholder="you@company.com" id="qEmail"></div>
+        <div><label class="form-label">Phone *</label><div style="display:flex"><select class="form-input" style="width:80px;border-radius:4px 0 0 4px;border-right:none"><option>+966</option><option>+971</option><option>+965</option></select><input class="form-input" style="border-radius:0 4px 4px 0;flex:1" type="text" placeholder="5X XXX XXXX" id="qPhone"></div></div>
+        <div><label class="form-label">Product Name or SKU *</label><input class="form-input" type="text" placeholder="e.g. SKF 6205-2RS" id="qProd"></div>
+        <div><label class="form-label">Quantity *</label><input class="form-input" type="number" placeholder="e.g. 100" min="1" id="qQty"></div>
+        <div><label class="form-label">Unit</label><select class="form-input" id="qUnit"><option>Pieces</option><option>Kilograms</option><option>Meters</option><option>Sets</option><option>Boxes</option></select></div>
+        <div><label class="form-label">Delivery City</label><select class="form-input" id="qCity"><option>Dammam</option><option>Riyadh</option><option>Jeddah</option><option>Khobar</option><option>Jubail</option><option>Yanbu</option><option>Other</option></select></div>
+        <div class="full"><label class="form-label">Notes / Special Requirements</label><textarea class="form-input" placeholder="Certifications needed, delivery timeline, special specs..." id="qNotes"></textarea></div>
+        <div class="full">
+          <label class="form-label">Attach File (optional)</label>
+          <div class="upload-zone" onclick="document.getElementById('fileInput').click()">
+            <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            <p><span>Click to upload</span> or drag & drop</p>
+            <p>PDF, Excel, or Word — Max 10MB</p>
+            <input type="file" id="fileInput" style="display:none" accept=".pdf,.xlsx,.xls,.doc,.docx">
+          </div>
+        </div>
+      </div>
+      <button class="submit-btn" onclick="submitQuote()">📤 Send Quote Request</button>
+      <p class="note">All quotes are free and without obligation. Response within 24 hours.</p>
+      <div class="success-msg" id="quoteSuccess">✓ &nbsp; Quote request sent! We will contact you within 24 hours.</div>
+    </div>
+    <div>
+      <div class="info-card">
+        <h3>Why Request a Quote?</h3>
+        <div class="why-list">
+          <div class="why-li"><div class="why-chk">✓</div>Competitive bulk pricing & volume discounts</div>
+          <div class="why-li"><div class="why-chk">✓</div>Access to 10,000+ products not listed online</div>
+          <div class="why-li"><div class="why-chk">✓</div>Custom sourcing for hard-to-find parts</div>
+          <div class="why-li"><div class="why-chk">✓</div>Dedicated account manager assigned</div>
+          <div class="why-li"><div class="why-chk">✓</div>Official VAT invoice provided</div>
+        </div>
+      </div>
+      <div class="info-card">
+        <h3>Contact Sales</h3>
+        <div class="iitem"><svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.64 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.55 1.5h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9a16 16 0 0 0 6 6l.91-.91a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.5 16.92z"/></svg><div class="iitem-text"><strong>Phone</strong><span>+966 9200 00000</span></div></div>
+        <div class="iitem"><svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg><div class="iitem-text"><strong>Email</strong><span>sales@mechnoskill.com</span></div></div>
+        <div class="iitem"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><div class="iitem-text"><strong>Response Time</strong><span>Within 24 hours</span></div></div>
+        <a href="https://wa.me/966920000000" class="wa-cta" target="_blank"><svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg><span>Chat on WhatsApp Now</span></a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CONTACT -->
+<div class="pg" id="pgContact">
+  <div class="pg-wrap">
+    <div class="form-card">
+      <h2>Send a Message</h2>
+      <p>For sales, support, technical questions or general inquiries.</p>
+      <div class="form-grid2">
+        <div><label class="form-label">Full Name *</label><input class="form-input" type="text" placeholder="Your name" id="cName"></div>
+        <div><label class="form-label">Email *</label><input class="form-input" type="email" placeholder="you@company.com" id="cEmail"></div>
+        <div><label class="form-label">Phone</label><input class="form-input" type="text" placeholder="+966 5X XXX XXXX" id="cPhone"></div>
+        <div><label class="form-label">Inquiry Type *</label><select class="form-input" id="cType"><option>Sales Inquiry</option><option>Bulk Order</option><option>Technical Support</option><option>Delivery & Shipping</option><option>Returns & Refunds</option><option>General Question</option></select></div>
+        <div class="full"><label class="form-label">Message *</label><textarea class="form-input" placeholder="How can we help? Please be as detailed as possible." id="cMsg" style="min-height:120px"></textarea></div>
+      </div>
+      <button class="submit-btn" onclick="submitContact()">📨 Send Message</button>
+      <div class="success-msg" id="contactSuccess">✓ &nbsp; Message sent! We will reply within 24 hours.</div>
+    </div>
+    <div>
+      <div class="info-card">
+        <h3>Contact Information</h3>
+        <div class="iitem"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg><div class="iitem-text"><strong>Address</strong><span>King Fahad Street, Dammam<br>Eastern Province, Saudi Arabia</span></div></div>
+        <div class="iitem"><svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.64 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.55 1.5h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9a16 16 0 0 0 6 6l.91-.91a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.5 16.92z"/></svg><div class="iitem-text"><strong>Phone</strong><span>+966 9200 00000</span></div></div>
+        <div class="iitem"><svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg><div class="iitem-text"><strong>Email</strong><span>support@mechnoskill.com</span></div></div>
+        <div class="iitem"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><div class="iitem-text"><strong>Business Hours</strong><span>Sun–Thu: 8AM–6PM<br>Sat: 9AM–2PM | Fri: Closed</span></div></div>
+      </div>
+      <div class="map-box"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg><p>Mechnoskill — Dammam</p><span>King Fahad St, Eastern Province, KSA</span></div>
+    </div>
+  </div>
+</div>
+
+<script>
+function switchTab(id,el){
+  document.querySelectorAll('.pg').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.ptab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('pg'+id.charAt(0).toUpperCase()+id.slice(1)).classList.add('active');
+  el.classList.add('active');
+}
+function submitQuote(){
+  const name=document.getElementById('qName').value.trim();
+  const email=document.getElementById('qEmail').value.trim();
+  const prod=document.getElementById('qProd').value.trim();
+  if(!name||!email||!prod){showToast('Please fill in required fields','error');return;}
+  MDB.addQuote({name:document.getElementById('qName').value,product:document.getElementById('qProd').value,qty:document.getElementById('qQty').value,city:document.getElementById('qCity').value});const el=document.getElementById('quoteSuccess');
+  el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'),5000);
+}
+function submitContact(){
+  const name=document.getElementById('cName').value.trim();
+  const email=document.getElementById('cEmail').value.trim();
+  const msg=document.getElementById('cMsg').value.trim();
+  if(!name||!email||!msg){showToast('Please fill in required fields','error');return;}
+  const el=document.getElementById('contactSuccess');
+  el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'),5000);
+}
+// Check URL hash
+window.addEventListener('DOMContentLoaded',()=>{
+  if(location.hash==='#quote') switchTab('quote',document.querySelector('.ptab'));
+});
+</script>
+<div id="footer-root"></div>
+<script>
+document.getElementById('header-root').innerHTML=renderHeader('contact.html');
+document.getElementById('footer-root').innerHTML=renderFooter();
+</script>
+</body></html>

@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cart & Checkout | Mechnoskill</title>
+<link rel="stylesheet" href="style.css">
+<script src="db.js"></script>
+<script src="components.js" defer></script>
+<style>
+.steps{background:#fff;padding:14px 32px;border-bottom:1px solid #eee;display:flex;align-items:center;justify-content:center;gap:0}
+.step{display:flex;align-items:center;gap:8px}
+.snum{width:26px;height:26px;border-radius:50%;background:#e0e0e0;color:#888;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center}
+.step.active .snum{background:#F5C800;color:#1e1e1e}
+.step.done .snum{background:#2b2b2b;color:#F5C800}
+.slabel{font-size:12px;font-weight:600;color:#aaa}
+.step.active .slabel{color:#1e1e1e;font-weight:700}
+.step.done .slabel{color:#555}
+.sline{width:56px;height:2px;background:#e0e0e0;margin:0 6px}
+.pg{display:none}.pg.active{display:block}
+.cart-layout{display:grid;grid-template-columns:1fr 300px;gap:20px;padding:24px 32px}
+.cart-tbl{background:#fff;border:1px solid #e8e8e8;border-radius:8px;overflow:hidden}
+.tbl-head{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 36px;background:#2b2b2b;padding:11px 18px;font-size:10px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:.5px;gap:8px}
+.cart-row{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 36px;padding:14px 18px;border-bottom:1px solid #f0f0f0;align-items:center;gap:8px}
+.cprod{display:flex;gap:10px;align-items:center}
+.cthumb{width:50px;height:50px;background:#f4f4f2;border:1px solid #eee;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.cthumb svg{width:24px;height:24px;stroke:#ccc;fill:none;stroke-width:1.2}
+.cbrand{font-size:10px;color:#F5C800;font-weight:700;text-transform:uppercase;margin-bottom:2px}
+.cname{font-size:12px;font-weight:600;color:#1e1e1e;line-height:1.4}
+.csku{font-size:10px;color:#bbb;margin-top:2px}
+.cprice{font-size:14px;font-weight:700;color:#1e1e1e}
+.qw{display:flex;align-items:center;border:1px solid #e8e8e8;border-radius:4px;width:fit-content}
+.qb{width:28px;height:28px;background:#f4f4f2;border:none;font-size:14px;cursor:pointer;font-weight:700;color:#444}
+.qb:hover{background:#FFFDE7;color:#F5C800}
+.qv{width:36px;text-align:center;font-size:12px;font-weight:700;border:none;border-left:1px solid #eee;border-right:1px solid #eee;outline:none;padding:4px 0;background:#fff}
+.ctot{font-size:14px;font-weight:800;color:#1e1e1e}
+.rmv{width:26px;height:26px;background:none;border:1px solid #eee;border-radius:4px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#ccc}
+.rmv:hover{border-color:#e74c3c;color:#e74c3c}
+.rmv svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2}
+.cart-actions{display:flex;justify-content:space-between;padding:12px 18px;background:#fafafa;border-top:1px solid #f0f0f0;flex-wrap:wrap;gap:8px}
+.coupon-row{display:flex;gap:8px}
+.coupon-row input{border:1px solid #e8e8e8;border-radius:4px;padding:7px 10px;font-size:12px;outline:none;width:160px}
+.coupon-row input:focus{border-color:#F5C800}
+.sum-card{background:#fff;border:1px solid #e8e8e8;border-radius:8px;padding:20px;position:sticky;top:80px}
+.sum-title{font-family:"Barlow Condensed",sans-serif;font-size:20px;font-weight:800;color:#1e1e1e;margin-bottom:16px;padding-bottom:10px;border-bottom:2px solid #F5C800}
+.sum-row{display:flex;justify-content:space-between;margin-bottom:9px;font-size:13px;color:#777}
+.sum-row span:last-child{font-weight:600;color:#1e1e1e}
+.sum-div{height:1px;background:#f0f0f0;margin:12px 0}
+.sum-total{display:flex;justify-content:space-between;font-size:17px;font-weight:800;color:#1e1e1e;margin-bottom:4px}
+.sum-vat{font-size:11px;color:#aaa;text-align:right;margin-bottom:14px}
+.chk-btn{width:100%;background:#F5C800;color:#1e1e1e;border:none;border-radius:4px;padding:13px;font-size:14px;font-weight:800;cursor:pointer;margin-bottom:8px;letter-spacing:.5px}
+.chk-btn:hover{background:#D4AA00}
+.bank-btn{width:100%;background:#2b2b2b;color:#fff;border:none;border-radius:4px;padding:11px;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:12px}
+.trust-badges{display:flex;justify-content:center;gap:14px;flex-wrap:wrap}
+.tb{font-size:10px;color:#aaa;display:flex;align-items:center;gap:4px}
+.empty-cart{text-align:center;padding:64px 32px;color:#aaa}
+.empty-cart svg{width:60px;height:60px;stroke:#ddd;fill:none;stroke-width:1;margin:0 auto 16px;display:block}
+/* CHECKOUT */
+.co-layout{display:grid;grid-template-columns:1fr 300px;gap:20px;padding:24px 32px}
+.co-form{background:#fff;border:1px solid #e8e8e8;border-radius:8px;padding:24px}
+.co-sec{margin-bottom:24px;padding-bottom:24px;border-bottom:1px solid #f0f0f0}
+.co-sec:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+.co-sec-title{font-family:"Barlow Condensed",sans-serif;font-size:18px;font-weight:800;color:#1e1e1e;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.sn{width:24px;height:24px;background:#F5C800;border-radius:50%;font-size:11px;font-weight:800;color:#1e1e1e;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.fg2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.fg2 .full{grid-column:1/-1}
+.pay-opts{display:flex;flex-direction:column;gap:8px}
+.pay-opt{display:flex;align-items:center;gap:12px;border:1.5px solid #e8e8e8;border-radius:6px;padding:11px 12px;cursor:pointer;transition:all .2s}
+.pay-opt.sel{border-color:#F5C800;background:#FFFDE7}
+.pay-opt input[type=radio]{accent-color:#F5C800;width:15px;height:15px}
+.pay-opt-lbl{font-size:13px;font-weight:700;color:#1e1e1e}
+.pay-opt-sub{font-size:11px;color:#999}
+.pay-chips{display:flex;gap:4px;margin-left:auto}
+.pc{background:#f0f0f0;border-radius:3px;padding:2px 6px;font-size:9px;font-weight:700;color:#666}
+.place-btn{width:100%;background:#F5C800;color:#1e1e1e;border:none;border-radius:4px;padding:14px;font-size:16px;font-weight:800;cursor:pointer;letter-spacing:.5px;margin-top:18px}
+.place-btn:hover{background:#D4AA00}
+.oi-card{background:#fff;border:1px solid #e8e8e8;border-radius:8px;padding:16px;margin-bottom:14px}
+.oi-title{font-family:"Barlow Condensed",sans-serif;font-size:17px;font-weight:800;color:#1e1e1e;margin-bottom:10px;padding-bottom:8px;border-bottom:2px solid #F5C800}
+.oi-row{display:flex;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid #f5f5f5}
+.oi-row:last-child{border-bottom:none}
+.oi-thumb{width:40px;height:40px;background:#f4f4f2;border-radius:4px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.oi-thumb svg{width:20px;height:20px;stroke:#ccc;fill:none;stroke-width:1.2}
+.oi-name{font-size:12px;font-weight:600;color:#1e1e1e;flex:1;line-height:1.3}
+.oi-qty{font-size:10px;color:#aaa}
+.oi-price{font-size:13px;font-weight:800;color:#1e1e1e;white-space:nowrap}
+/* CONFIRM */
+.confirm-wrap{padding:48px 32px;text-align:center;max-width:520px;margin:0 auto}
+.confirm-icon{width:70px;height:70px;background:#FFFDE7;border:3px solid #F5C800;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:28px}
+.confirm-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:13px;text-align:left}
+.cg-label{font-size:10px;font-weight:700;color:#aaa;text-transform:uppercase;margin-bottom:3px}
+.cg-val{font-weight:700;color:#1e1e1e}
+@media(max-width:800px){.cart-layout,.co-layout{grid-template-columns:1fr}.tbl-head,.cart-row{grid-template-columns:2fr 1fr 1fr 36px}.tbl-head span:nth-child(4),.cart-row .ctot{display:none}}
+</style>
+</head>
+<body>
+<div id="header-root"></div>
+<div class="breadcrumb"><a href="index.html">Home</a> › <span class="cur" id="bcText">Shopping Cart</span></div>
+
+<div class="steps">
+  <div class="step done" id="s1"><div class="snum">✓</div><div class="slabel">Cart</div></div>
+  <div class="sline"></div>
+  <div class="step active" id="s2"><div class="snum">2</div><div class="slabel">Checkout</div></div>
+  <div class="sline"></div>
+  <div class="step" id="s3"><div class="snum">3</div><div class="slabel">Confirmed</div></div>
+</div>
+
+<!-- CART -->
+<div class="pg active" id="pgCart">
+  <div class="cart-layout">
+    <div>
+      <div class="cart-tbl" id="cartTable">
+        <div class="tbl-head"><span>Product</span><span>Price</span><span>Qty</span><span>Total</span><span></span></div>
+        <div id="cartRows"></div>
+        <div class="cart-actions">
+          <div class="coupon-row"><input type="text" placeholder="Coupon code..." id="couponInput"><button class="btn-d" style="padding:7px 14px;font-size:12px" onclick="applyCoupon()">Apply</button></div>
+          <a href="shop.html" class="btn-outline" style="padding:7px 16px;font-size:12px;color:#555;border-color:#e8e8e8">← Continue Shopping</a>
+        </div>
+      </div>
+    </div>
+    <div class="sum-card">
+      <div class="sum-title">Order Summary</div>
+      <div class="sum-row"><span>Subtotal</span><span id="sumSubtotal">SAR 0.00</span></div>
+      <div class="sum-row"><span>Shipping</span><span style="color:#27ae60;font-weight:700">Free</span></div>
+      <div class="sum-row"><span>VAT (15%)</span><span>Included</span></div>
+      <div class="sum-row"><span>Discount</span><span id="sumDiscount" style="color:#e74c3c">− SAR 0.00</span></div>
+      <div class="sum-div"></div>
+      <div class="sum-total"><span>Total</span><span id="sumTotal">SAR 0.00</span></div>
+      <div class="sum-vat">Prices inclusive of 15% VAT</div>
+      <button class="chk-btn" onclick="goStep(2)">Proceed to Checkout →</button>
+      <button class="bank-btn" onclick="goStep(2)">💳 Bank Transfer</button>
+      <div class="trust-badges">
+        <div class="tb">🔒 Secure</div>
+        <div class="tb">↩ Free Returns</div>
+        <div class="tb">📞 24hr Support</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CHECKOUT -->
+<div class="pg" id="pgCheckout">
+  <div class="co-layout">
+    <div class="co-form">
+      <div class="co-sec">
+        <div class="co-sec-title"><div class="sn">1</div>Shipping Information</div>
+        <div class="fg2">
+          <div><label class="form-label">First Name *</label><input class="form-input" type="text" placeholder="Ahmed" id="shFirst"></div>
+          <div><label class="form-label">Last Name *</label><input class="form-input" type="text" placeholder="Al-Rashidi" id="shLast"></div>
+          <div class="full"><label class="form-label">Company Name</label><input class="form-input" type="text" placeholder="Optional" id="shCompany"></div>
+          <div class="full"><label class="form-label">Address *</label><input class="form-input" type="text" placeholder="Street, building..." id="shAddr"></div>
+          <div><label class="form-label">City *</label><select class="form-input" id="shCity"><option>Dammam</option><option>Riyadh</option><option>Jeddah</option><option>Khobar</option><option>Jubail</option><option>Yanbu</option></select></div>
+          <div><label class="form-label">Postal Code</label><input class="form-input" type="text" placeholder="31952" id="shZip"></div>
+          <div><label class="form-label">Phone *</label><input class="form-input" type="text" placeholder="+966 5X XXX XXXX" id="shPhone"></div>
+          <div><label class="form-label">Email *</label><input class="form-input" type="email" placeholder="you@company.com" id="shEmail"></div>
+        </div>
+      </div>
+      <div class="co-sec">
+        <div class="co-sec-title"><div class="sn">2</div>Payment Method</div>
+        <div class="pay-opts">
+          <div class="pay-opt sel" onclick="selPay(this)"><input type="radio" name="pay" checked><div><div class="pay-opt-lbl">Credit / Debit Card</div><div class="pay-opt-sub">Visa, Mastercard, Mada</div></div><div class="pay-chips"><span class="pc">VISA</span><span class="pc">MC</span><span class="pc">MADA</span></div></div>
+          <div class="pay-opt" onclick="selPay(this)"><input type="radio" name="pay"><div><div class="pay-opt-lbl">Bank Transfer</div><div class="pay-opt-sub">We'll send IBAN details by email</div></div><div class="pay-chips"><span class="pc">BANK</span></div></div>
+          <div class="pay-opt" onclick="selPay(this)"><input type="radio" name="pay"><div><div class="pay-opt-lbl">Cash on Delivery</div><div class="pay-opt-sub">Pay when your order arrives</div></div><div class="pay-chips"><span class="pc">COD</span></div></div>
+        </div>
+        <div style="margin-top:14px;background:#f9f9f9;border:1px solid #eee;border-radius:6px;padding:14px">
+          <div class="fg2">
+            <div class="full"><label class="form-label">Card Number</label><input class="form-input" type="text" placeholder="•••• •••• •••• ••••"></div>
+            <div><label class="form-label">Expiry</label><input class="form-input" type="text" placeholder="MM / YY"></div>
+            <div><label class="form-label">CVV</label><input class="form-input" type="text" placeholder="•••"></div>
+          </div>
+        </div>
+      </div>
+      <div class="co-sec">
+        <div class="co-sec-title"><div class="sn">3</div>Invoice & Notes</div>
+        <div class="fg2">
+          <div><label class="form-label">VAT Number (optional)</label><input class="form-input" type="text" placeholder="300XXXXXXXXXX"></div>
+          <div><label class="form-label">Order Notes</label><input class="form-input" type="text" placeholder="Special instructions..."></div>
+        </div>
+      </div>
+      <button class="place-btn" onclick="placeOrder()">🛒 Place Order</button>
+    </div>
+    <div>
+      <div class="oi-card">
+        <div class="oi-title">Your Items</div>
+        <div id="checkoutItems"></div>
+      </div>
+      <div class="sum-card" style="position:static">
+        <div class="sum-title">Total</div>
+        <div class="sum-row"><span>Subtotal</span><span id="coSubtotal">SAR 0.00</span></div>
+        <div class="sum-row"><span>Shipping</span><span style="color:#27ae60;font-weight:700">Free</span></div>
+        <div class="sum-row"><span>VAT (15%)</span><span>Included</span></div>
+        <div class="sum-div"></div>
+        <div class="sum-total"><span>Total</span><span id="coTotal">SAR 0.00</span></div>
+        <div class="sum-vat">All prices inclusive of 15% VAT</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CONFIRM -->
+<div class="pg" id="pgConfirm">
+  <div class="confirm-wrap">
+    <div class="confirm-icon">✓</div>
+    <h2 style="font-family:'Barlow Condensed',sans-serif;font-size:32px;font-weight:800;color:#1e1e1e;margin-bottom:8px">Order Confirmed!</h2>
+    <p style="color:#888;font-size:14px;margin-bottom:24px;line-height:1.6">Thank you for your order. A confirmation has been sent to your email. Your order will be processed within 1 business day.</p>
+    <div style="background:#fff;border:1px solid #e8e8e8;border-radius:8px;padding:20px;margin-bottom:24px">
+      <div class="confirm-grid">
+        <div><div class="cg-label">Order Number</div><div class="cg-val" style="color:#F5C800" id="confOrderNum">#MNS-00001</div></div>
+        <div><div class="cg-label">Date</div><div class="cg-val" id="confDate"></div></div>
+        <div><div class="cg-label">Total</div><div class="cg-val" id="confTotal"></div></div>
+        <div><div class="cg-label">Est. Delivery</div><div class="cg-val">2–3 Business Days</div></div>
+      </div>
+    </div>
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+      <a href="account.html" class="btn-y">View My Orders</a>
+      <a href="shop.html" class="btn-d">Continue Shopping</a>
+    </div>
+  </div>
+</div>
+
+<script>
+function renderCart(){
+  const cart=MDB.getCart();
+  if(cart.length===0){
+    document.getElementById('cartRows').innerHTML=`<div class="empty-cart"><svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg><p style="font-size:16px;font-weight:700;color:#555;margin-bottom:8px">Your cart is empty</p><p>Add some products to get started!</p><br><a href="shop.html" class="btn-y" style="display:inline-block;margin-top:8px">Browse Products</a></div>`;
+    document.getElementById('sumSubtotal').textContent='SAR 0.00';
+    document.getElementById('sumTotal').textContent='SAR 0.00';
+    return;
+  }
+  let subtotal=0;
+  document.getElementById('cartRows').innerHTML=cart.map(item=>{
+    const lineTotal=item.price*item.qty;subtotal+=lineTotal;
+    return `<div class="cart-row">
+      <div class="cprod"><div class="cthumb"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="8"/></svg></div>
+      <div><div class="cbrand">${item.brand}</div><div class="cname">${item.name}</div><div class="csku">${item.sku}</div></div></div>
+      <div class="cprice">SAR ${item.price.toFixed(2)}</div>
+      <div><div class="qw"><button class="qb" onclick="changeQty('${item.id}',-1)">−</button><input class="qv" value="${item.qty}" onchange="setQty('${item.id}',this.value)"><button class="qb" onclick="changeQty('${item.id}',1)">+</button></div></div>
+      <div class="ctot">SAR ${lineTotal.toFixed(2)}</div>
+      <button class="rmv" onclick="removeItem('${item.id}')"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>`;
+  }).join('');
+  document.getElementById('sumSubtotal').textContent='SAR '+subtotal.toFixed(2);
+  document.getElementById('sumTotal').textContent='SAR '+subtotal.toFixed(2);
+  // Checkout items
+  document.getElementById('checkoutItems').innerHTML=cart.map(item=>`<div class="oi-row"><div class="oi-thumb"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="8"/></svg></div><div class="oi-name">${item.name}<div class="oi-qty">× ${item.qty}</div></div><div class="oi-price">SAR ${(item.price*item.qty).toFixed(2)}</div></div>`).join('');
+  document.getElementById('coSubtotal').textContent='SAR '+subtotal.toFixed(2);
+  document.getElementById('coTotal').textContent='SAR '+subtotal.toFixed(2);
+}
+function changeQty(id,delta){const cart=MDB.getCart();const item=cart.find(i=>i.id===id);if(item){item.qty=Math.max(1,item.qty+delta);MDB.saveCart(cart);renderCart();}}
+function setQty(id,val){const cart=MDB.getCart();const item=cart.find(i=>i.id===id);if(item){item.qty=Math.max(1,parseInt(val)||1);MDB.saveCart(cart);renderCart();}}
+function removeItem(id){MDB.removeFromCart(id);renderCart();showToast('Item removed from cart');}
+function applyCoupon(){showToast('Coupon code invalid or expired','error');}
+function selPay(el){document.querySelectorAll('.pay-opt').forEach(o=>o.classList.remove('sel'));el.classList.add('sel');el.querySelector('input').checked=true;}
+function goStep(n){
+  ['pgCart','pgCheckout','pgConfirm'].forEach((id,i)=>{document.getElementById(id).classList.toggle('active',i===n-1)});
+  ['s1','s2','s3'].forEach((id,i)=>{const el=document.getElementById(id);el.className='step'+(i<n-1?' done':i===n-1?' active':'');});
+  const labels=['Shopping Cart','Checkout','Order Confirmed'];
+  document.getElementById('bcText').textContent=labels[n-1];
+  window.scrollTo(0,0);
+}
+function placeOrder(){
+  const first=document.getElementById('shFirst').value.trim();
+  const email=document.getElementById('shEmail').value.trim();
+  const phone=document.getElementById('shPhone').value.trim();
+  if(!first||!email||!phone){showToast('Please fill in required shipping fields');return;}
+  const num='#MNS-'+Math.floor(10000+Math.random()*90000);
+  document.getElementById('confOrderNum').textContent=num;
+  document.getElementById('confDate').textContent=new Date().toLocaleDateString('en-SA',{year:'numeric',month:'long',day:'numeric'});
+  document.getElementById('confTotal').textContent=document.getElementById('coTotal').textContent;
+  MDB.clearCart();
+  goStep(3);
+}
+window.addEventListener('DOMContentLoaded',()=>{renderCart();});
+</script>
+<div id="footer-root"></div>
+<script>
+document.getElementById('header-root').innerHTML=renderHeader('cart.html');
+document.getElementById('footer-root').innerHTML=renderFooter();
+</script>
+</body></html>

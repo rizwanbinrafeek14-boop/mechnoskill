@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Account | Mechnoskill</title>
+<link rel="stylesheet" href="style.css">
+<script src="db.js"></script>
+<script src="components.js" defer></script>
+<style>
+.auth-page{display:none}.auth-page.active{display:block}
+.auth-wrap{display:flex;align-items:flex-start;justify-content:center;gap:24px;padding:40px 32px;flex-wrap:wrap}
+.auth-card{background:#fff;border:1px solid #e8e8e8;border-radius:8px;padding:32px;width:100%;max-width:420px}
+.auth-title{font-family:"Barlow Condensed",sans-serif;font-size:26px;font-weight:800;color:#1e1e1e;margin-bottom:6px}
+.auth-sub{font-size:13px;color:#888;margin-bottom:22px}
+.auth-fields{display:flex;flex-direction:column;gap:14px}
+.link-y{color:#F5C800;font-weight:700;cursor:pointer;font-size:12px}
+.check-row{display:flex;align-items:center;gap:8px;font-size:13px;color:#666}
+.check-row input{accent-color:#F5C800}
+.submit-full{width:100%;background:#F5C800;color:#1e1e1e;border:none;border-radius:4px;padding:13px;font-size:15px;font-weight:800;cursor:pointer;margin-top:4px}
+.submit-full:hover{background:#D4AA00}
+.divider{display:flex;align-items:center;gap:12px;margin:14px 0;color:#ccc;font-size:12px}
+.divider::before,.divider::after{content:"";flex:1;height:1px;background:#eee}
+.switch-link{text-align:center;font-size:13px;color:#888;margin-top:14px}
+.info-side{background:#2b2b2b;border-radius:8px;padding:26px;max-width:280px;width:100%}
+.info-side h3{font-family:"Barlow Condensed",sans-serif;font-size:22px;font-weight:800;color:#fff;margin-bottom:14px}
+.info-side h3 span{color:#F5C800}
+.info-li{display:flex;gap:10px;align-items:flex-start;margin-bottom:10px}
+.info-chk{width:18px;height:18px;background:#F5C800;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#1e1e1e;flex-shrink:0;margin-top:1px}
+.info-text{font-size:13px;color:#aaa;line-height:1.5}
+.dash-layout{display:grid;grid-template-columns:220px 1fr;gap:0;min-height:70vh}
+.dash-sidebar{background:#2b2b2b;padding:22px 0}
+.dash-user{text-align:center;padding:0 18px 18px;border-bottom:1px solid #3a3a3a;margin-bottom:10px}
+.dash-avatar{width:60px;height:60px;background:#F5C800;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:"Barlow Condensed",sans-serif;font-size:22px;font-weight:800;color:#1e1e1e;margin:0 auto 10px}
+.dash-name{font-size:14px;font-weight:700;color:#fff;margin-bottom:2px}
+.dash-email{font-size:11px;color:#666}
+.dash-nav-link{display:flex;align-items:center;gap:10px;padding:10px 18px;font-size:13px;font-weight:500;color:#888;cursor:pointer;transition:all .2s;border:none;background:none;width:100%;text-align:left;border-left:3px solid transparent}
+.dash-nav-link:hover,.dash-nav-link.active{background:#353535;color:#F5C800;border-left-color:#F5C800;padding-left:15px}
+.dash-nav-link svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.8;flex-shrink:0}
+.dash-main{background:#f4f4f2;padding:22px}
+.dash-panel{display:none}.dash-panel.active{display:block}
+.dash-head{font-family:"Barlow Condensed",sans-serif;font-size:24px;font-weight:800;color:#1e1e1e;margin-bottom:18px}
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+.stat-card{background:#fff;border:1px solid #e8e8e8;border-radius:8px;padding:14px}
+.stat-label{font-size:10px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px}
+.stat-val{font-family:"Barlow Condensed",sans-serif;font-size:26px;font-weight:800;color:#1e1e1e}
+.stat-sub{font-size:11px;color:#aaa;margin-top:2px}
+.ord-tbl{background:#fff;border:1px solid #e8e8e8;border-radius:8px;overflow:hidden}
+.tbl-h{display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr 80px 70px;background:#2b2b2b;padding:10px 16px;font-size:10px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:.5px;gap:8px}
+.tbl-r{display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr 80px 70px;padding:11px 16px;border-bottom:1px solid #f5f5f5;align-items:center;gap:8px;font-size:12px}
+.tbl-r:last-child{border-bottom:none}
+.tbl-r:hover{background:#fafafa}
+.ord-id{font-weight:700;color:#F5C800;font-family:"Barlow Condensed",sans-serif;font-size:13px}
+.badge{padding:3px 10px;border-radius:20px;font-size:10px;font-weight:700;display:inline-block}
+.b-delivered{background:#E8F5E9;color:#2E7D32}
+.b-processing{background:#FFFDE7;color:#F57F17}
+.b-shipped{background:#E3F2FD;color:#1565C0}
+.vbtn{background:#F5C800;color:#1e1e1e;border:none;border-radius:4px;padding:5px 10px;font-size:11px;font-weight:700;cursor:pointer}
+.wish-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.wish-card{background:#fff;border:1px solid #e8e8e8;border-radius:8px;overflow:hidden}
+.wish-img{background:linear-gradient(135deg,#f5f5f3,#ebebea);height:110px;display:flex;align-items:center;justify-content:center;position:relative}
+.wish-img svg{width:44px;height:44px;stroke:#ccc;fill:none;stroke-width:1.2}
+.wish-rm{position:absolute;top:8px;right:8px;width:22px;height:22px;background:#fff;border:1px solid #eee;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:12px;color:#ccc}
+.wish-rm:hover{color:#e74c3c;border-color:#e74c3c}
+.wish-info{padding:10px}
+.wish-brand{font-size:10px;color:#F5C800;font-weight:700;text-transform:uppercase;margin-bottom:2px}
+.wish-name{font-size:12px;font-weight:600;color:#1e1e1e;margin-bottom:5px;line-height:1.3}
+.wish-price{font-size:13px;font-weight:800;color:#1e1e1e;margin-bottom:7px}
+.wish-add{width:100%;background:#F5C800;color:#1e1e1e;border:none;border-radius:4px;padding:6px;font-size:11px;font-weight:800;cursor:pointer}
+.profile-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.profile-card{background:#fff;border:1px solid #e8e8e8;border-radius:8px;padding:18px}
+.profile-card h3{font-family:"Barlow Condensed",sans-serif;font-size:17px;font-weight:800;color:#1e1e1e;margin-bottom:14px;padding-bottom:8px;border-bottom:2px solid #F5C800}
+.pf{display:flex;flex-direction:column;gap:10px}
+.save-btn{background:#F5C800;color:#1e1e1e;border:none;border-radius:4px;padding:9px 20px;font-size:12px;font-weight:800;cursor:pointer;margin-top:4px}
+.toggle-row2{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #f5f5f5;font-size:13px;color:#555}
+.toggle-row2:last-child{border-bottom:none}
+@media(max-width:700px){.dash-layout{grid-template-columns:1fr}.stat-row{grid-template-columns:1fr 1fr}.profile-grid{grid-template-columns:1fr}.wish-grid{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<div id="header-root"></div>
+<div class="breadcrumb"><a href="index.html">Home</a> › <span class="cur" id="bcText">My Account</span></div>
+
+<!-- LOGIN -->
+<div class="auth-page active" id="pgLogin">
+  <div class="auth-wrap">
+    <div class="auth-card">
+      <div class="auth-title">Welcome Back</div>
+      <div class="auth-sub">Sign in to your Mechnoskill account</div>
+      <div class="auth-fields">
+        <div><label class="form-label">Email *</label><input class="form-input" type="email" placeholder="you@company.com" id="liEmail"></div>
+        <div><label class="form-label">Password *</label><input class="form-input" type="password" placeholder="••••••••" id="liPass"><div style="text-align:right;margin-top:4px"><span class="link-y" onclick="showToast('Password reset email sent!')">Forgot password?</span></div></div>
+        <div class="check-row"><input type="checkbox" id="rem"><label for="rem">Remember me</label></div>
+        <button class="submit-full" onclick="doLogin()">Sign In →</button>
+      </div>
+      <div class="divider">or</div>
+      <button style="width:100%;background:#fff;color:#444;border:1.5px solid #e8e8e8;border-radius:4px;padding:11px;font-size:13px;font-weight:600;cursor:pointer" onclick="showToast('Google login coming soon')">🌐 Continue with Google</button>
+      <div class="switch-link">No account? <span class="link-y" onclick="switchAuth('reg')">Register here</span></div>
+    </div>
+    <div class="info-side">
+      <h3>Why Join <span>Mechnoskill?</span></h3>
+      <div class="info-li"><div class="info-chk">✓</div><div class="info-text">Track all your orders</div></div>
+      <div class="info-li"><div class="info-chk">✓</div><div class="info-text">Save to wishlist</div></div>
+      <div class="info-li"><div class="info-chk">✓</div><div class="info-text">Exclusive bulk pricing</div></div>
+      <div class="info-li"><div class="info-chk">✓</div><div class="info-text">Faster checkout</div></div>
+      <div class="info-li"><div class="info-chk">✓</div><div class="info-text">Manage quote requests</div></div>
+      <div class="info-li"><div class="info-chk">✓</div><div class="info-text">Official VAT invoices</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- REGISTER -->
+<div class="auth-page" id="pgReg">
+  <div class="auth-wrap" style="justify-content:center">
+    <div class="auth-card" style="max-width:500px">
+      <div class="auth-title">Create Account</div>
+      <div class="auth-sub">Join Mechnoskill — Saudi Arabia's trusted industrial supplier</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div><label class="form-label">First Name *</label><input class="form-input" type="text" placeholder="Ahmed" id="rgFirst"></div>
+        <div><label class="form-label">Last Name *</label><input class="form-input" type="text" placeholder="Al-Rashidi" id="rgLast"></div>
+        <div style="grid-column:1/-1"><label class="form-label">Email *</label><input class="form-input" type="email" placeholder="you@company.com" id="rgEmail"></div>
+        <div><label class="form-label">Password *</label><input class="form-input" type="password" placeholder="Min. 8 chars" id="rgPass"></div>
+        <div><label class="form-label">Confirm Password *</label><input class="form-input" type="password" placeholder="Repeat" id="rgPass2"></div>
+        <div><label class="form-label">Company (optional)</label><input class="form-input" type="text" id="rgComp"></div>
+        <div><label class="form-label">VAT Number (optional)</label><input class="form-input" type="text" id="rgVat"></div>
+        <div style="grid-column:1/-1"><div class="check-row"><input type="checkbox" id="terms"><label for="terms">I agree to the <a href="#" style="color:#F5C800">Terms & Conditions</a></label></div></div>
+        <div style="grid-column:1/-1"><button class="submit-full" onclick="doRegister()">Create Account →</button></div>
+      </div>
+      <div class="switch-link">Already have an account? <span class="link-y" onclick="switchAuth('login')">Sign in</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div class="auth-page" id="pgDash">
+  <div class="dash-layout">
+    <div class="dash-sidebar">
+      <div class="dash-user">
+        <div class="dash-avatar" id="dashAvatar">AR</div>
+        <div class="dash-name" id="dashName">Ahmed Al-Rashidi</div>
+        <div class="dash-email" id="dashEmail">ahmed@company.com</div>
+      </div>
+      <button class="dash-nav-link active" onclick="showPanel('Overview',this)"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Overview</button>
+      <button class="dash-nav-link" onclick="showPanel('Orders',this)"><svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>My Orders</button>
+      <button class="dash-nav-link" onclick="showPanel('Quotes',this)"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>My Quotes</button>
+      <button class="dash-nav-link" onclick="showPanel('Wishlist',this)"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>Wishlist</button>
+      <button class="dash-nav-link" onclick="showPanel('Profile',this)"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Profile Settings</button>
+      <button class="dash-nav-link" onclick="switchAuth('login')" style="margin-top:20px;border-top:1px solid #3a3a3a"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Sign Out</button>
+    </div>
+    <div class="dash-main">
+      <div class="dash-panel active" id="panelOverview">
+        <div class="dash-head">Welcome back! 👋</div>
+        <div class="stat-row">
+          <div class="stat-card"><div class="stat-label">Total Orders</div><div class="stat-val">12</div><div class="stat-sub">2 this month</div></div>
+          <div class="stat-card"><div class="stat-label">Total Spent</div><div class="stat-val" style="font-size:20px">SAR 14,820</div></div>
+          <div class="stat-card"><div class="stat-label">Pending Quotes</div><div class="stat-val" style="color:#F5C800">3</div></div>
+          <div class="stat-card"><div class="stat-label">Wishlist</div><div class="stat-val">4</div></div>
+        </div>
+        <div class="ord-tbl">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 16px;background:#fff;border-bottom:1px solid #f0f0f0"><span style="font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:800">Recent Orders</span><button class="vbtn" onclick="showPanel('Orders',document.querySelector('.dash-nav-link:nth-child(2)'))">View All →</button></div>
+          <div class="tbl-h"><span>Order #</span><span>Date</span><span>Items</span><span>Total</span><span>Status</span><span></span></div>
+          <div class="tbl-r"><div class="ord-id">#MNS-08741</div><div>Apr 20, 2026</div><div>3 items</div><div style="font-weight:700">SAR 930</div><div><span class="badge b-processing">Processing</span></div><div><button class="vbtn">View</button></div></div>
+          <div class="tbl-r"><div class="ord-id">#MNS-08619</div><div>Apr 10, 2026</div><div>7 items</div><div style="font-weight:700">SAR 2,340</div><div><span class="badge b-shipped">Shipped</span></div><div><button class="vbtn">View</button></div></div>
+          <div class="tbl-r"><div class="ord-id">#MNS-08501</div><div>Mar 28, 2026</div><div>2 items</div><div style="font-weight:700">SAR 490</div><div><span class="badge b-delivered">Delivered</span></div><div><button class="vbtn">View</button></div></div>
+        </div>
+      </div>
+      <div class="dash-panel" id="panelOrders">
+        <div class="dash-head">My Orders</div>
+        <div class="ord-tbl">
+          <div class="tbl-h"><span>Order #</span><span>Date</span><span>Items</span><span>Total</span><span>Status</span><span></span></div>
+          <div class="tbl-r"><div class="ord-id">#MNS-08741</div><div>Apr 20, 2026</div><div>3 items</div><div style="font-weight:700">SAR 930</div><div><span class="badge b-processing">Processing</span></div><div><button class="vbtn">View</button></div></div>
+          <div class="tbl-r"><div class="ord-id">#MNS-08619</div><div>Apr 10, 2026</div><div>7 items</div><div style="font-weight:700">SAR 2,340</div><div><span class="badge b-shipped">Shipped</span></div><div><button class="vbtn">View</button></div></div>
+          <div class="tbl-r"><div class="ord-id">#MNS-08501</div><div>Mar 28, 2026</div><div>2 items</div><div style="font-weight:700">SAR 490</div><div><span class="badge b-delivered">Delivered</span></div><div><button class="vbtn">View</button></div></div>
+          <div class="tbl-r"><div class="ord-id">#MNS-08388</div><div>Mar 15, 2026</div><div>12 items</div><div style="font-weight:700">SAR 5,200</div><div><span class="badge b-delivered">Delivered</span></div><div><button class="vbtn">View</button></div></div>
+        </div>
+      </div>
+      <div class="dash-panel" id="panelQuotes">
+        <div class="dash-head">My Quote Requests</div>
+        <div class="ord-tbl">
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr 80px;background:#2b2b2b;padding:10px 16px;font-size:10px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:.5px;gap:8px"><span>Quote #</span><span>Date</span><span>Product</span><span>Qty</span><span>Status</span></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr 80px;padding:11px 16px;border-bottom:1px solid #f5f5f5;align-items:center;gap:8px;font-size:12px"><div class="ord-id">#QT-0341</div><div>Apr 22, 2026</div><div>SKF Bearings 6205</div><div>500 pcs</div><div><span class="badge b-processing">Pending</span></div></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr 80px;padding:11px 16px;border-bottom:1px solid #f5f5f5;align-items:center;gap:8px;font-size:12px"><div class="ord-id">#QT-0298</div><div>Apr 18, 2026</div><div>Honeywell Respirators</div><div>50 sets</div><div><span class="badge b-processing">Pending</span></div></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr 80px;padding:11px 16px;align-items:center;gap:8px;font-size:12px"><div class="ord-id">#QT-0251</div><div>Apr 5, 2026</div><div>Bosch Grinders</div><div>20 units</div><div><span class="badge b-delivered">Quoted</span></div></div>
+        </div>
+      </div>
+      <div class="dash-panel" id="panelWishlist">
+        <div class="dash-head">My Wishlist</div>
+        <div class="wish-grid">
+          <div class="wish-card"><div class="wish-img"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="8"/></svg><div class="wish-rm" onclick="this.closest('.wish-card').remove()">✕</div></div><div class="wish-info"><div class="wish-brand">SKF</div><div class="wish-name">Angular Contact Bearing 7210 BEP</div><div class="wish-price">SAR 92.00</div><button class="wish-add" onclick="addToCart('p9','Angular Contact Bearing 7210 BEP','SKF',92,'MNS-BRG-7210')">+ Add to Cart</button></div></div>
+          <div class="wish-card"><div class="wish-img"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg><div class="wish-rm" onclick="this.closest('.wish-card').remove()">✕</div></div><div class="wish-info"><div class="wish-brand">MSA</div><div class="wish-name">Safety Helmet V-Gard Yellow</div><div class="wish-price">SAR 68.00</div><button class="wish-add" onclick="addToCart('p6','Safety Helmet V-Gard','MSA',68,'MNS-SAF-HLM1')">+ Add to Cart</button></div></div>
+          <div class="wish-card"><div class="wish-img"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/></svg><div class="wish-rm" onclick="this.closest('.wish-card').remove()">✕</div></div><div class="wish-info"><div class="wish-brand">MAKITA</div><div class="wish-name">Cordless Drill 18V LXT Kit</div><div class="wish-price">SAR 480.00</div><button class="wish-add" onclick="addToCart('p7','Cordless Drill 18V','MAKITA',480,'MNS-TLS-DHP481')">+ Add to Cart</button></div></div>
+        </div>
+      </div>
+      <div class="dash-panel" id="panelProfile">
+        <div class="dash-head">Profile Settings</div>
+        <div class="profile-grid">
+          <div class="profile-card"><h3>Personal Info</h3><div class="pf"><div><label class="form-label">First Name</label><input class="form-input" type="text" value="Ahmed"></div><div><label class="form-label">Last Name</label><input class="form-input" type="text" value="Al-Rashidi"></div><div><label class="form-label">Email</label><input class="form-input" type="email" value="ahmed@company.com"></div><div><label class="form-label">Phone</label><input class="form-input" type="text" value="+966 55 123 4567"></div><button class="save-btn" onclick="showToast('Profile saved!')">Save Changes</button></div></div>
+          <div class="profile-card"><h3>Company Info</h3><div class="pf"><div><label class="form-label">Company Name</label><input class="form-input" type="text" value="Al-Rashidi Industries"></div><div><label class="form-label">VAT Number</label><input class="form-input" type="text" value="300XXXXXXXXXX"></div><div><label class="form-label">City</label><input class="form-input" type="text" value="Dammam"></div><button class="save-btn" onclick="showToast('Company info saved!')">Save Changes</button></div></div>
+          <div class="profile-card"><h3>Change Password</h3><div class="pf"><div><label class="form-label">Current Password</label><input class="form-input" type="password" placeholder="••••••••"></div><div><label class="form-label">New Password</label><input class="form-input" type="password" placeholder="••••••••"></div><div><label class="form-label">Confirm Password</label><input class="form-input" type="password" placeholder="••••••••"></div><button class="save-btn" onclick="showToast('Password updated!')">Update Password</button></div></div>
+          <div class="profile-card"><h3>Notifications</h3><div>
+            <div class="toggle-row2">Order updates by email<div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+            <div class="toggle-row2">Quote responses<div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+            <div class="toggle-row2">Promotions & offers<div class="toggle" onclick="this.classList.toggle('on')"></div></div>
+            <div class="toggle-row2">WhatsApp notifications<div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+          </div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function switchAuth(to){
+  ['pgLogin','pgReg','pgDash'].forEach(id=>document.getElementById(id).classList.remove('active'));
+  const map={login:'pgLogin',reg:'pgReg',dash:'pgDash'};
+  document.getElementById(map[to]).classList.add('active');
+  const labels={login:'Sign In',reg:'Create Account',dash:'My Dashboard'};
+  document.getElementById('bcText').textContent=labels[to];
+}
+function doLogin(){
+  const email=document.getElementById('liEmail').value.trim();
+  const pass=document.getElementById('liPass').value;
+  if(!email||!pass){showToast('Please enter email and password');return;}
+  localStorage.setItem('ms_user',JSON.stringify({name:'Ahmed Al-Rashidi',email}));
+  switchAuth('dash');
+  showToast('Welcome back!');
+}
+function doRegister(){
+  const first=document.getElementById('rgFirst').value.trim();
+  const last=document.getElementById('rgLast').value.trim();
+  const email=document.getElementById('rgEmail').value.trim();
+  const pass=document.getElementById('rgPass').value;
+  const pass2=document.getElementById('rgPass2').value;
+  if(!first||!last||!email||!pass){showToast('Please fill in required fields');return;}
+  if(pass!==pass2){showToast('Passwords do not match');return;}
+  if(!document.getElementById('terms').checked){showToast('Please accept the Terms & Conditions');return;}
+  const name=first+' '+last;
+  MDB.setUser({name,email});
+  document.getElementById('dashAvatar').textContent=first[0]+last[0];
+  document.getElementById('dashName').textContent=name;
+  document.getElementById('dashEmail').textContent=email;
+  switchAuth('dash');
+  showToast('Account created! Welcome to Mechnoskill.');
+}
+function showPanel(name,el){
+  document.querySelectorAll('.dash-panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('panel'+name).classList.add('active');
+  document.querySelectorAll('.dash-nav-link').forEach(a=>a.classList.remove('active'));
+  if(el)el.classList.add('active');
+}
+window.addEventListener('DOMContentLoaded',()=>{
+  const user=MDB.getUser();
+  if(user){
+    const parts=user.name.split(' ');
+    document.getElementById('dashAvatar').textContent=(parts[0][0]+(parts[1]?parts[1][0]:'')).toUpperCase();
+    document.getElementById('dashName').textContent=user.name;
+    document.getElementById('dashEmail').textContent=user.email;
+    switchAuth('dash');
+  }
+});
+</script>
+<div id="footer-root"></div>
+<script>
+document.getElementById('header-root').innerHTML=renderHeader('account.html');
+document.getElementById('footer-root').innerHTML=renderFooter();
+</script>
+</body></html>
