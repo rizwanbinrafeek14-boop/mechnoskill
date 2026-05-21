@@ -1,0 +1,1114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mechno Skill — Admin Dashboard</title>
+
+  <!-- Google Fonts (same as main site) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@400;500&family=Rajdhani:wght@400;600;700" rel="stylesheet" />
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+  <style>
+    /* ─── CSS Variables ─────────────────────────────────────────── */
+    :root {
+      --admin-bg: #f8fafc;
+      --admin-sidebar: #0c1931;
+      --admin-header: #ffffff;
+      --admin-accent: #f5c518;
+      --admin-blue: #2563eb;
+      --admin-text: #0f172a;
+      --admin-text-2: #64748b;
+      --admin-border: #e2e8f0;
+      --admin-card: #ffffff;
+      --admin-input-bg: #f1f5f9;
+      --admin-success: #22c55e;
+      --admin-danger: #ef4444;
+      --font-head: 'Barlow Condensed', sans-serif;
+      --font-body: 'Barlow', sans-serif;
+    }
+
+    /* ─── Reset & Base ──────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      height: 100%;
+      font-family: var(--font-body);
+      font-size: 15px;
+      color: var(--admin-text);
+      background: var(--admin-bg);
+    }
+
+    /* ─── Login Overlay ─────────────────────────────────────────── */
+    #login-overlay {
+      position: fixed;
+      inset: 0;
+      background: var(--admin-sidebar);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.5s ease;
+    }
+
+    #login-overlay.slide-up {
+      transform: translateY(-100%);
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .login-card {
+      background: #132040;
+      border: 1px solid rgba(245, 197, 24, 0.2);
+      border-radius: 16px;
+      padding: 48px 40px 40px;
+      width: 100%;
+      max-width: 400px;
+      box-shadow: 0 32px 64px rgba(0,0,0,0.5);
+      text-align: center;
+    }
+
+    .login-card.shake {
+      animation: shake 0.45s ease;
+    }
+
+    @keyframes shake {
+      0%,100% { transform: translateX(0); }
+      15%      { transform: translateX(-10px); }
+      30%      { transform: translateX(10px); }
+      45%      { transform: translateX(-8px); }
+      60%      { transform: translateX(8px); }
+      75%      { transform: translateX(-5px); }
+      90%      { transform: translateX(5px); }
+    }
+
+    .login-logo {
+      font-family: var(--font-head);
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: 2px;
+      color: #fff;
+      margin-bottom: 4px;
+    }
+
+    .login-logo span { color: var(--admin-accent); }
+
+    .login-sub {
+      font-size: 12px;
+      color: rgba(255,255,255,0.45);
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      margin-bottom: 36px;
+    }
+
+    .login-label {
+      display: block;
+      text-align: left;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.5);
+      margin-bottom: 8px;
+    }
+
+    .login-input {
+      width: 100%;
+      padding: 12px 16px;
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 8px;
+      color: #fff;
+      font-family: var(--font-body);
+      font-size: 15px;
+      outline: none;
+      transition: border-color 0.2s;
+      margin-bottom: 24px;
+    }
+
+    .login-input:focus {
+      border-color: var(--admin-accent);
+      background: rgba(255,255,255,0.1);
+    }
+
+    .login-input::placeholder { color: rgba(255,255,255,0.25); }
+
+    .login-btn {
+      width: 100%;
+      padding: 13px;
+      background: var(--admin-accent);
+      color: #0f172a;
+      font-family: var(--font-head);
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.15s;
+    }
+
+    .login-btn:hover { background: #e6b800; transform: translateY(-1px); }
+    .login-btn:active { transform: translateY(0); }
+
+    .login-error {
+      margin-top: 12px;
+      font-size: 13px;
+      color: var(--admin-danger);
+      min-height: 20px;
+    }
+
+    /* ─── Admin Layout ──────────────────────────────────────────── */
+    #admin-layout {
+      display: none;
+      flex-direction: column;
+      height: 100vh;
+    }
+
+    #admin-layout.visible {
+      display: flex;
+    }
+
+    /* Header */
+    #admin-header {
+      height: 64px;
+      min-height: 64px;
+      background: var(--admin-header);
+      border-bottom: 1px solid var(--admin-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px 0 0;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+      z-index: 100;
+    }
+
+    .header-brand {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      height: 100%;
+    }
+
+    .header-sidebar-toggle {
+      display: none;
+      width: 64px;
+      height: 64px;
+      align-items: center;
+      justify-content: center;
+      background: none;
+      border: none;
+      color: var(--admin-text-2);
+      font-size: 20px;
+      cursor: pointer;
+    }
+
+    .header-title {
+      font-family: var(--font-head);
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: 1px;
+      color: var(--admin-sidebar);
+      padding-left: 24px;
+    }
+
+    .header-title span { color: var(--admin-accent); }
+
+    .header-actions { display: flex; align-items: center; gap: 12px; }
+
+    .header-badge {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      color: var(--admin-text-2);
+      background: var(--admin-input-bg);
+      padding: 4px 10px;
+      border-radius: 20px;
+      border: 1px solid var(--admin-border);
+    }
+
+    .btn-logout {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 8px 16px;
+      background: none;
+      border: 1px solid var(--admin-border);
+      border-radius: 8px;
+      color: var(--admin-text-2);
+      font-family: var(--font-body);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+    }
+
+    .btn-logout:hover {
+      background: #fef2f2;
+      color: var(--admin-danger);
+      border-color: #fecaca;
+    }
+
+    /* Body (sidebar + main) */
+    .admin-body {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    /* Sidebar */
+    #admin-sidebar {
+      width: 260px;
+      min-width: 260px;
+      background: var(--admin-sidebar);
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      transition: transform 0.3s ease;
+    }
+
+    .sidebar-section-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.3);
+      padding: 20px 20px 8px;
+    }
+
+    .sidebar-nav { list-style: none; padding: 0 10px; }
+
+    .sidebar-nav li a {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 11px 14px;
+      border-radius: 8px;
+      color: rgba(255,255,255,0.65);
+      text-decoration: none;
+      font-family: var(--font-body);
+      font-size: 14px;
+      font-weight: 500;
+      transition: background 0.18s, color 0.18s;
+      cursor: pointer;
+    }
+
+    .sidebar-nav li a i {
+      width: 18px;
+      text-align: center;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+
+    .sidebar-nav li a:hover {
+      background: rgba(255,255,255,0.07);
+      color: #fff;
+    }
+
+    .sidebar-nav li a.active {
+      background: var(--admin-accent);
+      color: #0f172a;
+      font-weight: 700;
+    }
+
+    .sidebar-nav li a.active i { color: #0f172a; }
+
+    .sidebar-divider {
+      height: 1px;
+      background: rgba(255,255,255,0.08);
+      margin: 12px 20px;
+    }
+
+    .sidebar-bottom { padding: 10px 10px 20px; margin-top: auto; }
+
+    .sidebar-bottom a {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 11px 14px;
+      border-radius: 8px;
+      color: rgba(255,255,255,0.5);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      transition: background 0.18s, color 0.18s;
+      cursor: pointer;
+    }
+
+    .sidebar-bottom a:hover {
+      background: rgba(255,255,255,0.07);
+      color: rgba(255,255,255,0.85);
+    }
+
+    .sidebar-bottom a i { width: 18px; text-align: center; font-size: 14px; }
+
+    /* Main area */
+    #admin-main {
+      flex: 1;
+      overflow-y: auto;
+      padding: 32px;
+      background: var(--admin-bg);
+    }
+
+    .section-header {
+      margin-bottom: 24px;
+    }
+
+    .section-header h2 {
+      font-family: var(--font-head);
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      color: var(--admin-text);
+    }
+
+    .section-header p {
+      color: var(--admin-text-2);
+      font-size: 14px;
+      margin-top: 4px;
+    }
+
+    /* Content sections */
+    .content-section { display: none; }
+    .content-section.active { display: block; }
+
+    /* Card */
+    .admin-card {
+      background: var(--admin-card);
+      border: 1px solid var(--admin-border);
+      border-radius: 12px;
+      padding: 28px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+      margin-bottom: 24px;
+    }
+
+    .card-title {
+      font-family: var(--font-head);
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--admin-text-2);
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--admin-border);
+    }
+
+    /* Form fields */
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--admin-text-2);
+      margin-bottom: 7px;
+    }
+
+    .form-hint {
+      font-size: 12px;
+      color: var(--admin-text-2);
+      margin-top: 5px;
+      font-style: italic;
+      font-weight: 400;
+      text-transform: none;
+      letter-spacing: 0;
+    }
+
+    .form-input,
+    .form-textarea,
+    .form-select {
+      width: 100%;
+      padding: 10px 14px;
+      background: var(--admin-input-bg);
+      border: 1px solid var(--admin-border);
+      border-radius: 8px;
+      color: var(--admin-text);
+      font-family: var(--font-body);
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      line-height: 1.5;
+    }
+
+    .form-textarea {
+      resize: vertical;
+      min-height: 90px;
+    }
+
+    .form-input:focus,
+    .form-textarea:focus,
+    .form-select:focus {
+      border-color: var(--admin-blue);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+      background: #fff;
+    }
+
+    /* Stats grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .stat-row {
+      background: var(--admin-input-bg);
+      border: 1px solid var(--admin-border);
+      border-radius: 10px;
+      padding: 16px;
+    }
+
+    .stat-row-title {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--admin-text-2);
+      margin-bottom: 12px;
+    }
+
+    .stat-row .form-group { margin-bottom: 12px; }
+    .stat-row .form-group:last-child { margin-bottom: 0; }
+
+    /* Save button */
+    .btn-save {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      padding: 14px;
+      background: var(--admin-accent);
+      color: #0f172a;
+      font-family: var(--font-head);
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.15s;
+      margin-top: 4px;
+    }
+
+    .btn-save:hover { background: #e6b800; transform: translateY(-1px); }
+    .btn-save:active { transform: translateY(0); }
+
+    .btn-save.saved {
+      background: var(--admin-success);
+      color: #fff;
+    }
+
+    /* Reset link */
+    .reset-link {
+      display: block;
+      text-align: center;
+      margin-top: 14px;
+      font-size: 13px;
+      color: var(--admin-danger);
+      cursor: pointer;
+      text-decoration: none;
+      background: none;
+      border: none;
+      font-family: var(--font-body);
+    }
+
+    .reset-link:hover { text-decoration: underline; }
+
+    /* Toast */
+    #toast {
+      position: fixed;
+      bottom: 28px;
+      right: 28px;
+      background: #0f172a;
+      color: #fff;
+      padding: 13px 22px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 500;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transform: translateY(80px);
+      opacity: 0;
+      transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease;
+      z-index: 500;
+    }
+
+    #toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    #toast i { color: var(--admin-success); font-size: 16px; }
+
+    /* Overlay backdrop for mobile sidebar */
+    #sidebar-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.45);
+      z-index: 200;
+    }
+
+    /* ─── Responsive ────────────────────────────────────────────── */
+    @media (max-width: 768px) {
+      #admin-sidebar {
+        position: fixed;
+        top: 64px;
+        left: 0;
+        bottom: 0;
+        z-index: 300;
+        transform: translateX(-100%);
+        width: 240px;
+        min-width: 240px;
+      }
+
+      #admin-sidebar.open {
+        transform: translateX(0);
+      }
+
+      #sidebar-backdrop.open {
+        display: block;
+      }
+
+      .header-sidebar-toggle { display: flex; }
+      .header-title { padding-left: 12px; }
+
+      #admin-main { padding: 20px 16px; }
+
+      .stats-grid { grid-template-columns: 1fr; }
+
+      .header-badge { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ═══════════════════════════ LOGIN OVERLAY ═══════════════════════════ -->
+  <div id="login-overlay">
+    <div class="login-card" id="login-card">
+      <div class="login-logo">MECHNO<span> SKILL</span></div>
+      <div class="login-sub">Admin Dashboard</div>
+
+      <label class="login-label" for="login-password">Password</label>
+      <input
+        class="login-input"
+        type="password"
+        id="login-password"
+        placeholder="Enter admin password"
+        autocomplete="current-password"
+      />
+      <button class="login-btn" id="login-btn">
+        <i class="fas fa-unlock-alt"></i>&nbsp; Sign In
+      </button>
+      <div class="login-error" id="login-error"></div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════ ADMIN LAYOUT ═══════════════════════════ -->
+  <div id="admin-layout">
+
+    <!-- Header -->
+    <header id="admin-header">
+      <div class="header-brand">
+        <button class="header-sidebar-toggle" id="sidebar-toggle" aria-label="Toggle sidebar">
+          <i class="fas fa-bars"></i>
+        </button>
+        <div class="header-title">MECHNO<span> SKILL</span> &mdash; Admin</div>
+      </div>
+      <div class="header-actions">
+        <span class="header-badge"><i class="fas fa-circle" style="color:var(--admin-success);font-size:8px;vertical-align:middle;margin-right:5px;"></i>Logged In</span>
+        <button class="btn-logout" id="logout-btn">
+          <i class="fas fa-sign-out-alt"></i> Logout
+        </button>
+      </div>
+    </header>
+
+    <!-- Body -->
+    <div class="admin-body">
+
+      <!-- Sidebar backdrop (mobile) -->
+      <div id="sidebar-backdrop"></div>
+
+      <!-- Sidebar -->
+      <nav id="admin-sidebar">
+        <div class="sidebar-section-label">Content</div>
+        <ul class="sidebar-nav">
+          <li>
+            <a href="#" data-section="hero" class="nav-link active">
+              <i class="fas fa-star"></i> Hero Section
+            </a>
+          </li>
+          <li>
+            <a href="#" data-section="about" class="nav-link">
+              <i class="fas fa-building"></i> About Section
+            </a>
+          </li>
+          <li>
+            <a href="#" data-section="stats" class="nav-link">
+              <i class="fas fa-chart-bar"></i> Stats
+            </a>
+          </li>
+          <li>
+            <a href="#" data-section="contact" class="nav-link">
+              <i class="fas fa-phone-alt"></i> Contact Info
+            </a>
+          </li>
+          <li>
+            <a href="#" data-section="footer" class="nav-link">
+              <i class="fas fa-shoe-prints"></i> Footer
+            </a>
+          </li>
+        </ul>
+
+        <div class="sidebar-divider"></div>
+
+        <div class="sidebar-bottom">
+          <a href="index.html" id="back-to-site">
+            <i class="fas fa-arrow-left"></i> Back to Site
+          </a>
+        </div>
+      </nav>
+
+      <!-- Main Content -->
+      <main id="admin-main">
+
+        <!-- ── HERO SECTION ── -->
+        <div class="content-section active" id="section-hero">
+          <div class="section-header">
+            <h2><i class="fas fa-star" style="color:var(--admin-accent);margin-right:10px;font-size:20px;"></i>Hero Section</h2>
+            <p>Edit the main hero banner displayed at the top of the homepage.</p>
+          </div>
+          <div class="admin-card">
+            <div class="card-title">Hero Content</div>
+
+            <div class="form-group">
+              <label class="form-label" for="ms_hero_badge">Badge Text</label>
+              <input class="form-input" type="text" id="ms_hero_badge"
+                data-key="ms_hero_badge"
+                data-default="TRUSTED SINCE 2014 · AL-KHOBAR, KSA"
+                placeholder="TRUSTED SINCE 2014 · AL-KHOBAR, KSA" />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="ms_hero_title">Page Title <span class="form-hint">(HTML allowed)</span></label>
+              <textarea class="form-textarea" id="ms_hero_title"
+                data-key="ms_hero_title"
+                data-default="FORGING THE<br/><span class='accent-gradient'>FUTURE</span><br/>OF INDUSTRY"
+                rows="4"
+                placeholder="FORGING THE&lt;br/&gt;&lt;span class='accent-gradient'&gt;FUTURE&lt;/span&gt;&lt;br/&gt;OF INDUSTRY"></textarea>
+              <span class="form-hint">Use <code>&lt;br/&gt;</code> for line breaks. Use <code>&lt;span class='accent-gradient'&gt;TEXT&lt;/span&gt;</code> for gold gradient text.</span>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="ms_hero_sub">Subtitle</label>
+              <textarea class="form-textarea" id="ms_hero_sub"
+                data-key="ms_hero_sub"
+                data-default="Premium Carbon &amp; Stainless Steel Pipes, Fittings &amp; Industrial Solutions"
+                rows="3"
+                placeholder="Premium Carbon &amp; Stainless Steel Pipes..."></textarea>
+            </div>
+
+            <button class="btn-save" data-section-save="hero">
+              <i class="fas fa-save"></i> Save Hero Changes
+            </button>
+          </div>
+        </div>
+
+        <!-- ── ABOUT SECTION ── -->
+        <div class="content-section" id="section-about">
+          <div class="section-header">
+            <h2><i class="fas fa-building" style="color:var(--admin-accent);margin-right:10px;font-size:20px;"></i>About Section</h2>
+            <p>Edit the About Us content displayed on the homepage.</p>
+          </div>
+          <div class="admin-card">
+            <div class="card-title">About Content</div>
+
+            <div class="form-group">
+              <label class="form-label" for="ms_about_lead">Lead Paragraph</label>
+              <textarea class="form-textarea" id="ms_about_lead"
+                data-key="ms_about_lead"
+                data-default=""
+                rows="4"
+                placeholder="Opening lead paragraph for the About section..."></textarea>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="ms_about_body1">Body Paragraph 1</label>
+              <textarea class="form-textarea" id="ms_about_body1"
+                data-key="ms_about_body1"
+                data-default=""
+                rows="4"
+                placeholder="First body paragraph..."></textarea>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="ms_about_body2">Body Paragraph 2</label>
+              <textarea class="form-textarea" id="ms_about_body2"
+                data-key="ms_about_body2"
+                data-default=""
+                rows="4"
+                placeholder="Second body paragraph..."></textarea>
+            </div>
+
+            <button class="btn-save" data-section-save="about">
+              <i class="fas fa-save"></i> Save About Changes
+            </button>
+          </div>
+        </div>
+
+        <!-- ── STATS SECTION ── -->
+        <div class="content-section" id="section-stats">
+          <div class="section-header">
+            <h2><i class="fas fa-chart-bar" style="color:var(--admin-accent);margin-right:10px;font-size:20px;"></i>Stats</h2>
+            <p>Edit the four key statistics shown in the stats bar.</p>
+          </div>
+          <div class="admin-card">
+            <div class="card-title">Statistics</div>
+            <div class="stats-grid">
+
+              <div class="stat-row">
+                <div class="stat-row-title">Stat 1</div>
+                <div class="form-group">
+                  <label class="form-label" for="ms_stat1_num">Number</label>
+                  <input class="form-input" type="number" id="ms_stat1_num"
+                    data-key="ms_stat1_num" data-default="10" placeholder="10" />
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="ms_stat1_label">Label</label>
+                  <input class="form-input" type="text" id="ms_stat1_label"
+                    data-key="ms_stat1_label" data-default="Years Experience" placeholder="Years Experience" />
+                </div>
+              </div>
+
+              <div class="stat-row">
+                <div class="stat-row-title">Stat 2</div>
+                <div class="form-group">
+                  <label class="form-label" for="ms_stat2_num">Number</label>
+                  <input class="form-input" type="number" id="ms_stat2_num"
+                    data-key="ms_stat2_num" data-default="500" placeholder="500" />
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="ms_stat2_label">Label</label>
+                  <input class="form-input" type="text" id="ms_stat2_label"
+                    data-key="ms_stat2_label" data-default="Projects Delivered" placeholder="Projects Delivered" />
+                </div>
+              </div>
+
+              <div class="stat-row">
+                <div class="stat-row-title">Stat 3</div>
+                <div class="form-group">
+                  <label class="form-label" for="ms_stat3_num">Number</label>
+                  <input class="form-input" type="number" id="ms_stat3_num"
+                    data-key="ms_stat3_num" data-default="50" placeholder="50" />
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="ms_stat3_label">Label</label>
+                  <input class="form-input" type="text" id="ms_stat3_label"
+                    data-key="ms_stat3_label" data-default="Global Brands" placeholder="Global Brands" />
+                </div>
+              </div>
+
+              <div class="stat-row">
+                <div class="stat-row-title">Stat 4</div>
+                <div class="form-group">
+                  <label class="form-label" for="ms_stat4_num">Number</label>
+                  <input class="form-input" type="number" id="ms_stat4_num"
+                    data-key="ms_stat4_num" data-default="15" placeholder="15" />
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="ms_stat4_label">Label</label>
+                  <input class="form-input" type="text" id="ms_stat4_label"
+                    data-key="ms_stat4_label" data-default="Product Categories" placeholder="Product Categories" />
+                </div>
+              </div>
+
+            </div>
+
+            <button class="btn-save" data-section-save="stats" style="margin-top:24px;">
+              <i class="fas fa-save"></i> Save Stats Changes
+            </button>
+          </div>
+        </div>
+
+        <!-- ── CONTACT SECTION ── -->
+        <div class="content-section" id="section-contact">
+          <div class="section-header">
+            <h2><i class="fas fa-phone-alt" style="color:var(--admin-accent);margin-right:10px;font-size:20px;"></i>Contact Info</h2>
+            <p>Edit the contact information displayed on the homepage and in the footer.</p>
+          </div>
+          <div class="admin-card">
+            <div class="card-title">Contact Details</div>
+
+            <div class="form-group">
+              <label class="form-label" for="ms_contact_address">Address</label>
+              <textarea class="form-textarea" id="ms_contact_address"
+                data-key="ms_contact_address"
+                data-default=""
+                rows="3"
+                placeholder="Full address..."></textarea>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="ms_contact_phone1">Phone 1</label>
+              <input class="form-input" type="text" id="ms_contact_phone1"
+                data-key="ms_contact_phone1" data-default="" placeholder="+966 ..." />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="ms_contact_phone2">Phone 2</label>
+              <input class="form-input" type="text" id="ms_contact_phone2"
+                data-key="ms_contact_phone2" data-default="" placeholder="+966 ..." />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="ms_contact_email">Email Address</label>
+              <input class="form-input" type="email" id="ms_contact_email"
+                data-key="ms_contact_email" data-default="" placeholder="info@example.com" />
+            </div>
+
+            <button class="btn-save" data-section-save="contact">
+              <i class="fas fa-save"></i> Save Contact Changes
+            </button>
+          </div>
+        </div>
+
+        <!-- ── FOOTER SECTION ── -->
+        <div class="content-section" id="section-footer">
+          <div class="section-header">
+            <h2><i class="fas fa-shoe-prints" style="color:var(--admin-accent);margin-right:10px;font-size:20px;"></i>Footer</h2>
+            <p>Edit the footer tagline and copyright text.</p>
+          </div>
+          <div class="admin-card">
+            <div class="card-title">Footer Content</div>
+
+            <div class="form-group">
+              <label class="form-label" for="ms_footer_tagline">Tagline</label>
+              <textarea class="form-textarea" id="ms_footer_tagline"
+                data-key="ms_footer_tagline"
+                data-default=""
+                rows="3"
+                placeholder="Footer tagline text..."></textarea>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="ms_copyright">Copyright Text</label>
+              <input class="form-input" type="text" id="ms_copyright"
+                data-key="ms_copyright" data-default="" placeholder="© 2024 Mechno Skill Est. All rights reserved." />
+            </div>
+
+            <button class="btn-save" data-section-save="footer">
+              <i class="fas fa-save"></i> Save Footer Changes
+            </button>
+
+            <div style="margin-top: 28px; padding-top: 20px; border-top: 1px solid var(--admin-border);">
+              <div style="font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--admin-text-2);margin-bottom:8px;">Danger Zone</div>
+              <button class="reset-link" id="reset-all-btn">
+                <i class="fas fa-trash-alt"></i> Reset All Content to Defaults
+              </button>
+              <div style="font-size:12px;color:var(--admin-text-2);text-align:center;margin-top:6px;">
+                This will clear all <code>ms_*</code> localStorage keys and reload the page.
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </main>
+    </div><!-- /.admin-body -->
+  </div><!-- /#admin-layout -->
+
+  <!-- Toast -->
+  <div id="toast"><i class="fas fa-check-circle"></i> <span id="toast-msg">Changes saved!</span></div>
+
+  <!-- ═══════════════════════════ JAVASCRIPT ═══════════════════════════ -->
+  <script>
+    (function () {
+      'use strict';
+
+      /* ── Constants ─────────────────────────────────────── */
+      var ADMIN_PASSWORD = 'mechno@admin2024';
+      var SESSION_KEY    = 'ms_logged_in';
+
+      /* ── DOM refs ──────────────────────────────────────── */
+      var loginOverlay   = document.getElementById('login-overlay');
+      var loginCard      = document.getElementById('login-card');
+      var loginInput     = document.getElementById('login-password');
+      var loginBtn       = document.getElementById('login-btn');
+      var loginError     = document.getElementById('login-error');
+      var adminLayout    = document.getElementById('admin-layout');
+      var logoutBtn      = document.getElementById('logout-btn');
+      var sidebarToggle  = document.getElementById('sidebar-toggle');
+      var adminSidebar   = document.getElementById('admin-sidebar');
+      var sidebarBackdrop= document.getElementById('sidebar-backdrop');
+      var toast          = document.getElementById('toast');
+      var toastMsg       = document.getElementById('toast-msg');
+      var resetBtn       = document.getElementById('reset-all-btn');
+      var navLinks       = document.querySelectorAll('.nav-link');
+      var contentSections= document.querySelectorAll('.content-section');
+      var saveButtons    = document.querySelectorAll('.btn-save');
+      var allFields      = document.querySelectorAll('[data-key]');
+
+      /* ── Helpers ───────────────────────────────────────── */
+      var toastTimer;
+      function showToast(msg) {
+        toastMsg.textContent = msg || 'Changes saved!';
+        toast.classList.add('show');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(function () {
+          toast.classList.remove('show');
+        }, 2500);
+      }
+
+      function getVal(key, defaultVal) {
+        var stored = localStorage.getItem(key);
+        return stored !== null ? stored : (defaultVal || '');
+      }
+
+      /* ── Auth ──────────────────────────────────────────── */
+      function isLoggedIn() {
+        return sessionStorage.getItem(SESSION_KEY) === '1';
+      }
+
+      function showDashboard() {
+        loginOverlay.classList.add('slide-up');
+        adminLayout.classList.add('visible');
+        populateAllFields();
+      }
+
+      function doLogin() {
+        var pwd = loginInput.value.trim();
+        if (pwd === ADMIN_PASSWORD) {
+          sessionStorage.setItem(SESSION_KEY, '1');
+          loginError.textContent = '';
+          showDashboard();
+        } else {
+          loginError.textContent = 'Incorrect password. Please try again.';
+          loginCard.classList.remove('shake');
+          void loginCard.offsetWidth; // reflow to restart animation
+          loginCard.classList.add('shake');
+          loginInput.value = '';
+          loginInput.focus();
+        }
+      }
+
+      loginBtn.addEventListener('click', doLogin);
+      loginInput.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') doLogin();
+      });
+
+      /* ── Logout ────────────────────────────────────────── */
+      logoutBtn.addEventListener('click', function () {
+        sessionStorage.removeItem(SESSION_KEY);
+        location.reload();
+      });
+
+      /* ── Sidebar toggle (mobile) ───────────────────────── */
+      sidebarToggle.addEventListener('click', function () {
+        adminSidebar.classList.toggle('open');
+        sidebarBackdrop.classList.toggle('open');
+      });
+
+      sidebarBackdrop.addEventListener('click', function () {
+        adminSidebar.classList.remove('open');
+        sidebarBackdrop.classList.remove('open');
+      });
+
+      /* ── Navigation ────────────────────────────────────── */
+      navLinks.forEach(function (link) {
+        link.addEventListener('click', function (e) {
+          e.preventDefault();
+          var target = this.getAttribute('data-section');
+
+          // update nav active state
+          navLinks.forEach(function (l) { l.classList.remove('active'); });
+          this.classList.add('active');
+
+          // show correct section
+          contentSections.forEach(function (s) { s.classList.remove('active'); });
+          var targetSection = document.getElementById('section-' + target);
+          if (targetSection) targetSection.classList.add('active');
+
+          // close sidebar on mobile
+          adminSidebar.classList.remove('open');
+          sidebarBackdrop.classList.remove('open');
+
+          // scroll main to top
+          document.getElementById('admin-main').scrollTop = 0;
+        });
+      });
+
+      /* ── Populate fields from localStorage ────────────── */
+      function populateAllFields() {
+        allFields.forEach(function (field) {
+          var key = field.getAttribute('data-key');
+          var def = field.getAttribute('data-default') || '';
+          field.value = getVal(key, def);
+        });
+      }
+
+      /* ── Save section ──────────────────────────────────── */
+      saveButtons.forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var sectionId = this.getAttribute('data-section-save');
+          var sectionEl = document.getElementById('section-' + sectionId);
+          if (!sectionEl) return;
+
+          var fields = sectionEl.querySelectorAll('[data-key]');
+          fields.forEach(function (field) {
+            var key = field.getAttribute('data-key');
+            localStorage.setItem(key, field.value);
+          });
+
+          // button feedback
+          var me = this;
+          me.classList.add('saved');
+          me.innerHTML = '<i class="fas fa-check"></i> Saved!';
+          setTimeout(function () {
+            me.classList.remove('saved');
+            me.innerHTML = '<i class="fas fa-save"></i> Save ' + capitalize(sectionId) + ' Changes';
+          }, 2000);
+
+          showToast('Changes saved successfully!');
+        });
+      });
+
+      function capitalize(str) {
+        return str.charAt(0).toUpperCase() + str.slice(1);
+      }
+
+      /* ── Reset to defaults ─────────────────────────────── */
+      resetBtn.addEventListener('click', function () {
+        if (!confirm('Are you sure you want to reset ALL content to defaults? This cannot be undone.')) return;
+        Object.keys(localStorage)
+          .filter(function (k) { return k.startsWith('ms_'); })
+          .forEach(function (k) { localStorage.removeItem(k); });
+        showToast('All content reset to defaults. Reloading...');
+        setTimeout(function () { location.reload(); }, 1200);
+      });
+
+      /* ── Init ──────────────────────────────────────────── */
+      if (isLoggedIn()) {
+        // Skip overlay
+        loginOverlay.style.display = 'none';
+        adminLayout.classList.add('visible');
+        populateAllFields();
+      } else {
+        loginInput.focus();
+      }
+
+    })();
+  </script>
+</body>
+</html>
