@@ -3,6 +3,59 @@
    Particles · Scroll · Counter · Filter · Form
 ═══════════════════════════════════════════════════ */
 
+// ─── ADMIN CONTENT LOADER ────────────────────────
+(function loadAdminContent() {
+  const get = k => localStorage.getItem(k);
+
+  const set = (sel, val, html) => {
+    const el = document.querySelector(sel);
+    if (el) html ? (el.innerHTML = val) : (el.textContent = val);
+  };
+
+  const heroBadge = get('ms_hero_badge');
+  if (heroBadge) set('.hero-badge', heroBadge);
+
+  const heroTitle = get('ms_hero_title');
+  if (heroTitle) set('.hero-title', heroTitle, true);
+
+  const heroSub = get('ms_hero_sub');
+  if (heroSub) set('.hero-sub', heroSub, true);
+
+  const aboutLead = get('ms_about_lead');
+  if (aboutLead) set('.about-lead', aboutLead);
+
+  const bodies = document.querySelectorAll('.about-body');
+  const b1 = get('ms_about_body1'); if (b1 && bodies[0]) bodies[0].textContent = b1;
+  const b2 = get('ms_about_body2'); if (b2 && bodies[1]) bodies[1].textContent = b2;
+
+  const statCounters = document.querySelectorAll('.stats-bar .counter');
+  const statLabels   = document.querySelectorAll('.stats-bar .stat-label');
+  [1, 2, 3, 4].forEach((i, idx) => {
+    const num = get(`ms_stat${i}_num`);
+    const lbl = get(`ms_stat${i}_label`);
+    if (num && statCounters[idx]) statCounters[idx].dataset.target = num;
+    if (lbl && statLabels[idx])   statLabels[idx].textContent = lbl;
+  });
+
+  const addr = get('ms_contact_address');
+  if (addr) { const el = document.querySelector('[data-ms="contact_address"]'); if (el) el.innerHTML = addr.replace(/\n/g, '<br>'); }
+
+  const p1 = get('ms_contact_phone1');
+  if (p1) { const el = document.querySelector('[data-ms="contact_phone1"]'); if (el) { el.textContent = p1; el.href = 'tel:' + p1.replace(/\s/g, ''); } }
+
+  const p2 = get('ms_contact_phone2');
+  if (p2) { const el = document.querySelector('[data-ms="contact_phone2"]'); if (el) { el.textContent = p2; el.href = 'tel:' + p2.replace(/\s/g, ''); } }
+
+  const email = get('ms_contact_email');
+  if (email) document.querySelectorAll('[data-ms="contact_email"]').forEach(el => { el.textContent = email; el.href = 'mailto:' + email; });
+
+  const tagline = get('ms_footer_tagline');
+  if (tagline) set('.footer-tagline', tagline, true);
+
+  const copy = get('ms_copyright');
+  if (copy) set('.footer-bottom p', copy);
+})();
+
 // ─── PRELOADER ───────────────────────────────────
 window.addEventListener('load', () => {
   setTimeout(() => {
