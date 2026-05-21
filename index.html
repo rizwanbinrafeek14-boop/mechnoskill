@@ -6,11 +6,14 @@
   <title>Mechno Skill Est. | Steel Pipes, Fittings & Industrial Solutions – Al-Khobar, Saudi Arabia</title>
   <meta name="description" content="Mechno Skill Est. is a leading supplier of carbon steel & stainless steel pipes, fittings, valves, flanges, and industrial safety solutions in Saudi Arabia." />
   <link rel="icon" type="image/png" href="assets/logo.png" />
+  <link rel="preload" href="assets/images/hero-factory.webp" as="image" type="image/webp" fetchpriority="high" />
 
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;600;700;800;900&family=Barlow:wght@300;400;500;600&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@400;500&family=Rajdhani:wght@400;600;700" rel="stylesheet" />
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com" />
+  <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com" />
 
   <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
@@ -22,7 +25,10 @@
   <!-- ═══════════════════════════ PRELOADER ═══════════════════════════ -->
   <div id="preloader">
     <div class="preloader-inner">
-      <img src="assets/logo.png" alt="Mechno Skill" class="preloader-logo" />
+      <picture>
+          <source srcset="assets/logo.webp" type="image/webp" />
+          <img src="assets/logo.png" alt="Mechno Skill" class="preloader-logo" loading="eager" />
+        </picture>
       <div class="preloader-bar"><div class="preloader-fill"></div></div>
       <span class="preloader-text">LOADING</span>
     </div>
@@ -32,7 +38,10 @@
   <header id="header">
     <div class="header-inner container">
       <a href="#home" class="logo-link">
-        <img src="assets/logo.png" alt="Mechno Skill Logo" class="nav-logo" />
+        <picture>
+          <source srcset="assets/logo.webp" type="image/webp" />
+          <img src="assets/logo.png" alt="Mechno Skill Logo" class="nav-logo" loading="eager" />
+        </picture>
         <div class="logo-text">
           <span class="logo-name">MECHNO<span class="accent"> SKILL</span></span>
           <span class="logo-tagline">EST. – SAUDI ARABIA</span>
@@ -141,7 +150,10 @@
         <!-- Left: image collage -->
         <div class="about-visual reveal-left">
           <div class="about-img-wrap">
-            <img src="assets/images/hero-factory.png" alt="Mechno Skill facility" class="about-img-main" />
+            <picture>
+          <source srcset="assets/images/hero-factory.webp" type="image/webp" />
+          <img src="assets/images/hero-factory.png" alt="Mechno Skill facility" class="about-img-main" loading="eager" fetchpriority="high" />
+        </picture>
             <div class="about-img-overlay"></div>
           </div>
           <div class="about-floating-card float-card-1">
@@ -254,7 +266,10 @@
         <!-- Card: Carbon Steel Pipes -->
         <div class="prod-card reveal-up" data-category="pipes">
           <div class="prod-img-wrap">
-            <img src="assets/images/products/pipes.png" alt="Carbon Steel Pipes" loading="lazy" />
+            <picture>
+          <source srcset="assets/images/products/pipes.webp" type="image/webp" />
+          <img src="assets/images/products/pipes.png" alt="Carbon Steel Pipes" loading="lazy" decoding="async" />
+        </picture>
             <div class="prod-overlay">
               <div class="prod-overlay-content">
                 <p>ASTM A53, A106 · API 5L · Sizes 1/8" – 72"</p>
@@ -276,7 +291,10 @@
         <!-- Card: Stainless Steel Pipes -->
         <div class="prod-card reveal-up" data-category="pipes">
           <div class="prod-img-wrap">
-            <img src="assets/images/products/flanges2.png" alt="Stainless Steel Pipes" loading="lazy" />
+            <picture>
+          <source srcset="assets/images/products/flanges2.webp" type="image/webp" />
+          <img src="assets/images/products/flanges2.png" alt="Stainless Steel Pipes" loading="lazy" decoding="async" />
+        </picture>
             <div class="prod-overlay">
               <div class="prod-overlay-content">
                 <p>ASTM A312, A321, A789 · Grades TP 304/316</p>
@@ -298,7 +316,10 @@
         <!-- Card: Carbon Steel Fittings -->
         <div class="prod-card reveal-up" data-category="fittings">
           <div class="prod-img-wrap">
-            <img src="assets/images/products/fittings.png" alt="Carbon Steel Fittings" loading="lazy" />
+            <picture>
+          <source srcset="assets/images/products/fittings.webp" type="image/webp" />
+          <img src="assets/images/products/fittings.png" alt="Carbon Steel Fittings" loading="lazy" decoding="async" />
+        </picture>
             <div class="prod-overlay">
               <div class="prod-overlay-content">
                 <p>ASTM A234-WPB Butt-Weld · 1/2" – 60"</p>
@@ -320,7 +341,10 @@
         <!-- Card: Copper Fittings -->
         <div class="prod-card reveal-up" data-category="fittings">
           <div class="prod-img-wrap">
-            <img src="assets/images/products/copper-fittings.png" alt="Copper Fittings" loading="lazy" />
+            <picture>
+          <source srcset="assets/images/products/copper-fittings.webp" type="image/webp" />
+          <img src="assets/images/products/copper-fittings.png" alt="Copper Fittings" loading="lazy" decoding="async" />
+        </picture>
             <div class="prod-overlay">
               <div class="prod-overlay-content">
                 <p>Elbows 45°/90°, Tees, Couplings, Adapters · 1/4" – 8"</p>
@@ -342,7 +366,10 @@
         <!-- Card: Forged Fittings -->
         <div class="prod-card reveal-up" data-category="fittings">
           <div class="prod-img-wrap">
-            <img src="assets/images/products/forged-fittings.png" alt="Forged Fittings" loading="lazy" />
+            <picture>
+          <source srcset="assets/images/products/forged-fittings.webp" type="image/webp" />
+          <img src="assets/images/products/forged-fittings.png" alt="Forged Fittings" loading="lazy" decoding="async" />
+        </picture>
             <div class="prod-overlay">
               <div class="prod-overlay-content">
                 <p>2000–9000 LBS Threaded &amp; Socket-Weld</p>
@@ -364,7 +391,10 @@
         <!-- Card: Flanges -->
         <div class="prod-card reveal-up" data-category="flanges-valves">
           <div class="prod-img-wrap">
-            <img src="assets/images/products/flanges.png" alt="Flanges" loading="lazy" />
+            <picture>
+          <source srcset="assets/images/products/flanges.webp" type="image/webp" />
+          <img src="assets/images/products/flanges.png" alt="Flanges" loading="lazy" decoding="async" />
+        </picture>
             <div class="prod-overlay">
               <div class="prod-overlay-content">
                 <p>ASTM A105 · A182 · Classes 150–2500</p>
@@ -386,7 +416,10 @@
         <!-- Card: Valves -->
         <div class="prod-card reveal-up" data-category="flanges-valves">
           <div class="prod-img-wrap">
-            <img src="assets/images/products/valves-better.png" alt="Industrial Valves" loading="lazy" />
+            <picture>
+          <source srcset="assets/images/products/valves-better.webp" type="image/webp" />
+          <img src="assets/images/products/valves-better.png" alt="Industrial Valves" loading="lazy" decoding="async" />
+        </picture>
             <div class="prod-overlay">
               <div class="prod-overlay-content">
                 <p>Gate, Globe, Check, Ball, Butterfly · 1/2" – 60"</p>
@@ -408,7 +441,10 @@
         <!-- Card: Instrument Valves -->
         <div class="prod-card reveal-up" data-category="flanges-valves">
           <div class="prod-img-wrap">
-            <img src="assets/images/products/instrument-valves.png" alt="Instrument Valves" loading="lazy" />
+            <picture>
+          <source srcset="assets/images/products/instrument-valves.webp" type="image/webp" />
+          <img src="assets/images/products/instrument-valves.png" alt="Instrument Valves" loading="lazy" decoding="async" />
+        </picture>
             <div class="prod-overlay">
               <div class="prod-overlay-content">
                 <p>Ball, Needle, Relief, Check, Manifold, DBB</p>
@@ -430,7 +466,10 @@
         <!-- Card: Sheets & Plates -->
         <div class="prod-card reveal-up" data-category="structural">
           <div class="prod-img-wrap">
-            <img src="assets/images/products/tubes.png" alt="Steel Sheets" loading="lazy" />
+            <picture>
+          <source srcset="assets/images/products/tubes.webp" type="image/webp" />
+          <img src="assets/images/products/tubes.png" alt="Steel Sheets" loading="lazy" decoding="async" />
+        </picture>
             <div class="prod-overlay">
               <div class="prod-overlay-content">
                 <p>ASTM A36, A283C, A572 GR50, SA516 GR70</p>
@@ -452,7 +491,10 @@
         <!-- Card: Channels & Beams -->
         <div class="prod-card reveal-up" data-category="structural">
           <div class="prod-img-wrap">
-            <img src="assets/images/products/beams.png" alt="Structural Beams" loading="lazy" />
+            <picture>
+          <source srcset="assets/images/products/beams.webp" type="image/webp" />
+          <img src="assets/images/products/beams.png" alt="Structural Beams" loading="lazy" decoding="async" />
+        </picture>
             <div class="prod-overlay">
               <div class="prod-overlay-content">
                 <p>UPN, UPE, PFC, IPE, IPN, HEA, HEB, UC, W, I-Beam, H-Beam</p>
@@ -474,7 +516,10 @@
         <!-- Card: Fasteners -->
         <div class="prod-card reveal-up" data-category="structural">
           <div class="prod-img-wrap">
-            <img src="assets/images/products/fasteners.png" alt="Fasteners" loading="lazy" />
+            <picture>
+          <source srcset="assets/images/products/fasteners.webp" type="image/webp" />
+          <img src="assets/images/products/fasteners.png" alt="Fasteners" loading="lazy" decoding="async" />
+        </picture>
             <div class="prod-overlay">
               <div class="prod-overlay-content">
                 <p>Bolts, Nuts, Washers, Studs, Anchors · ASTM A193/A194</p>
@@ -496,7 +541,10 @@
         <!-- Card: Gaskets & Gauges -->
         <div class="prod-card reveal-up" data-category="structural">
           <div class="prod-img-wrap">
-            <img src="assets/images/products/gaskets.png" alt="Gaskets" loading="lazy" />
+            <picture>
+          <source srcset="assets/images/products/gaskets.webp" type="image/webp" />
+          <img src="assets/images/products/gaskets.png" alt="Gaskets" loading="lazy" decoding="async" />
+        </picture>
             <div class="prod-overlay">
               <div class="prod-overlay-content">
                 <p>Spiral-wound, Ring Joint, Kammprofile, Flange Gaskets</p>
@@ -518,7 +566,10 @@
         <!-- Card: Safety Equipment -->
         <div class="prod-card reveal-up" data-category="safety">
           <div class="prod-img-wrap">
-            <img src="assets/images/products/safety.png" alt="Industrial Safety Equipment" loading="lazy" />
+            <picture>
+          <source srcset="assets/images/products/safety.webp" type="image/webp" />
+          <img src="assets/images/products/safety.png" alt="Industrial Safety Equipment" loading="lazy" decoding="async" />
+        </picture>
             <div class="prod-overlay">
               <div class="prod-overlay-content">
                 <p>PPE, Helmets, Harnesses, Fire Protection</p>
@@ -540,7 +591,10 @@
         <!-- Card: Electrical Solutions -->
         <div class="prod-card reveal-up" data-category="safety">
           <div class="prod-img-wrap">
-            <img src="assets/images/products/electrical.png" alt="Electrical Solutions" loading="lazy" />
+            <picture>
+          <source srcset="assets/images/products/electrical.webp" type="image/webp" />
+          <img src="assets/images/products/electrical.png" alt="Electrical Solutions" loading="lazy" decoding="async" />
+        </picture>
             <div class="prod-overlay">
               <div class="prod-overlay-content">
                 <p>ABB · Schneider · Philips · GE Lighting · Fulham</p>
@@ -562,7 +616,10 @@
         <!-- Card: Welding Solutions -->
         <div class="prod-card reveal-up" data-category="safety">
           <div class="prod-img-wrap">
-            <img src="assets/images/products/welding.png" alt="Welding Solutions" loading="lazy" />
+            <picture>
+          <source srcset="assets/images/products/welding.webp" type="image/webp" />
+          <img src="assets/images/products/welding.png" alt="Welding Solutions" loading="lazy" decoding="async" />
+        </picture>
             <div class="prod-overlay">
               <div class="prod-overlay-content">
                 <p>Böhler · Hyundai · Hypertherm · Red-D-Arc</p>
@@ -605,7 +662,10 @@
           </a>
         </div>
         <div class="pipe-chart-visual">
+          <picture>
+          <source srcset="assets/images/products/forged-fittings.webp" type="image/webp" />
           <img src="assets/images/products/forged-fittings.png" alt="Pipe fittings catalog" />
+        </picture>
           <div class="chart-badge-1 float-2">
             <i class="fa-solid fa-certificate"></i>
             <span>ASTM / API Compliant</span>
@@ -760,7 +820,10 @@
   <!-- ═══════════════════════════ INDUSTRIES SERVED ═══════════════════════════ -->
   <section class="section industries-section">
     <div class="industries-bg-wrap">
-      <img src="assets/images/hero-factory.png" alt="" class="industries-bg" />
+      <picture>
+          <source srcset="assets/images/hero-factory.webp" type="image/webp" />
+          <img src="assets/images/hero-factory.png" alt="" class="industries-bg" loading="lazy" />
+        </picture>
       <div class="industries-overlay"></div>
     </div>
     <div class="container">
@@ -910,7 +973,10 @@
     <div class="footer-top">
       <div class="container footer-grid">
         <div class="footer-brand">
+          <picture>
+          <source srcset="assets/logo.webp" type="image/webp" />
           <img src="assets/logo.png" alt="Mechno Skill Logo" class="footer-logo" />
+        </picture>
           <p class="footer-about">
             Mechno Skill Est. — Saudi Arabia's trusted supplier of carbon steel &amp; stainless steel pipes, fittings, valves, flanges, and industrial solutions.
           </p>

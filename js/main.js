@@ -62,13 +62,13 @@ if (window.innerWidth > 900) {
 
   function init() {
     resize();
-    particles = Array.from({ length: 120 }, () => new Particle());
+    particles = Array.from({ length: 60 }, () => new Particle());
   }
 
   function draw() {
     ctx.clearRect(0, 0, W, H);
-    // draw connection lines
-    for (let i = 0; i < particles.length; i++) {
+    // draw connection lines (skip on mobile for perf)
+    if (W > 768) for (let i = 0; i < particles.length; i++) {
       for (let j = i + 1; j < particles.length; j++) {
         const dx = particles[i].x - particles[j].x;
         const dy = particles[i].y - particles[j].y;
@@ -82,7 +82,7 @@ if (window.innerWidth > 900) {
           ctx.stroke();
         }
       }
-    }
+    }}
     particles.forEach(p => { p.update(); p.draw(); });
     requestAnimationFrame(draw);
   }
