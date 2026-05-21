@@ -141,7 +141,7 @@ if (window.innerWidth > 900) {
           ctx.stroke();
         }
       }
-    }}
+    }
     particles.forEach(p => { p.update(); p.draw(); });
     requestAnimationFrame(draw);
   }
