@@ -3,9 +3,20 @@
    Particles · Scroll · Counter · Filter · Form
 ═══════════════════════════════════════════════════ */
 
+// ─── PRELOADER SAFETY FALLBACK ───────────────────
+// Hide after 4 s max regardless of load state
+(function() {
+  const hide = () => {
+    const el = document.getElementById('preloader');
+    if (el) el.classList.add('hidden');
+  };
+  window.addEventListener('load', () => setTimeout(hide, 600));
+  setTimeout(hide, 4000);
+})();
+
 // ─── ADMIN CONTENT LOADER ────────────────────────
 (function loadAdminContent() {
-  const get = k => localStorage.getItem(k);
+  const get = k => { try { return localStorage.getItem(k); } catch(e) { return null; } };
 
   const set = (sel, val, html) => {
     const el = document.querySelector(sel);
@@ -56,12 +67,7 @@
   if (copy) set('.footer-bottom p', copy);
 })();
 
-// ─── PRELOADER ───────────────────────────────────
-window.addEventListener('load', () => {
-  setTimeout(() => {
-    document.getElementById('preloader').classList.add('hidden');
-  }, 1800);
-});
+// ─── PRELOADER (handled by safety fallback above) ─
 
 // ─── CURSOR GLOW (desktop) ───────────────────────
 if (window.innerWidth > 900) {
